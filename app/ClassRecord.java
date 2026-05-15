@@ -7,23 +7,28 @@ import java.util.List;
  */
 public class ClassRecord {
     final int    classInstanceId;
+    final int    topicId;         // needed for topic-level edits
+    final int    offeringId;      // needed for offering-level edits
     final String topicCode;
     final String topicName;
-    final String mode;           // attendance mode, e.g. "In person"
+    final String mode;            // attendance mode, e.g. "In person"
     final String campus;
     final String semester;
-    final int    offeringGroup;  // availability number
+    final int    offeringGroup;   // availability number
     final String classType;
     final int    instanceNumber;
-    final String firstDate;      // MIN(date_start) across all sessions
-    final String lastDate;       // MAX(date_end) across all sessions
+    final String firstDate;       // MIN(date_start) across all sessions
+    final String lastDate;        // MAX(date_end) across all sessions
     List<SessionRecord> sessions = new ArrayList<>();
 
-    ClassRecord(int classInstanceId, String topicCode, String topicName,
+    ClassRecord(int classInstanceId, int topicId, int offeringId,
+                String topicCode, String topicName,
                 String mode, String campus, String semester, int offeringGroup,
                 String classType, int instanceNumber,
                 String firstDate, String lastDate) {
         this.classInstanceId = classInstanceId;
+        this.topicId         = topicId;
+        this.offeringId      = offeringId;
         this.topicCode       = topicCode;
         this.topicName       = topicName;
         this.mode            = mode;
