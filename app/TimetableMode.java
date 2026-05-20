@@ -565,7 +565,6 @@ public class TimetableMode {
 
         Config.blankLine();
         Config.subheader("Selected classes");
-        Config.divider();
 
         List<ClassRecord> classes = new ArrayList<>(t.selectedClasses);
         classes.sort(Comparator
@@ -573,34 +572,25 @@ public class TimetableMode {
                 .thenComparing(c -> c.classType)
                 .thenComparingInt(c -> c.instanceNumber));
 
-        System.out.println("  " + Config.b(Config.pad("Topic", 10))
-                + Config.b(Config.pad("Type", 16))
-                + Config.b(Config.pad("Inst", 6))
-                + Config.b(Config.pad("Campus", 24))
-                + Config.b(Config.pad("Sem", 6))
-                + Config.b(Config.pad("Avail", 7))
-                + Config.b("Date range"));
-        Config.divider();
-
         for (ClassRecord cr : classes) {
-            System.out.println("  "
-                    + Config.c(Config.pad(cr.topicCode, 10))
-                    + Config.pad(cr.classType, 16)
-                    + Config.pad(String.valueOf(cr.instanceNumber), 6)
-                    + Config.pad(cr.campus, 24)
-                    + Config.pad(cr.semester, 6)
-                    + Config.pad(String.valueOf(cr.offeringGroup), 7)
+            Config.divider();
+            System.out.println("  " + Config.b(Config.c(cr.topicCode))
+                    + "  " + Config.b(cr.classType + " #" + cr.instanceNumber));
+            System.out.println("    " + Config.b("Campus: ") + cr.campus);
+            System.out.println("    " + Config.b("Semester: ") + cr.semester
+                    + "    " + Config.b("Availability: ") + cr.offeringGroup);
+            System.out.println("    " + Config.b("Class dates: ")
                     + Config.dim(cr.firstDate + "  →  " + cr.lastDate));
 
             for (SessionRecord s : cr.sessions) {
-                System.out.println("      "
-                        + Config.pad(s.dayDisplay(), 24)
+                System.out.println("      " + Config.y("• ")
+                        + Config.pad(s.dayDisplay(), 12)
                         + Config.pad(s.timeStart + " - " + s.timeEnd, 15)
-                        + Config.pad(s.location, 32)
+                        + s.location + "  "
                         + Config.dim(s.dateStart + "  →  " + s.dateEnd));
             }
-            Config.divider();
         }
+        Config.divider();
 
         Config.success("Generated timetable with " + classes.size() + " selected class instance(s).");
         Config.blankLine();
