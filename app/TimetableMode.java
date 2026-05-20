@@ -126,7 +126,10 @@ public class TimetableMode {
         Config.menuItem("0", "Cancel");
 
         String pick = Config.prompt(sc, "Enter timetable number to delete");
-        if (pick.equals("0") || pick.isBlank()) return;
+        if (pick.equals("0") || pick.isBlank()) {
+            Config.info("Deletion cancelled.");
+            return;
+        }
 
         int idx;
         try { idx = Integer.parseInt(pick.trim()) - 1; }
@@ -138,7 +141,7 @@ public class TimetableMode {
         Config.warn("WARNING: You are about to permanently delete this generated timetable:");
         Config.println(Config.b(target.name) + Config.dim("  (" + target.selectedClasses.size() + " classes)"));
         Config.blankLine();
-        String answer = Config.prompt(sc, "Type  yes  to confirm deletion, or press Enter to cancel");
+        String answer = Config.prompt(sc, "Type yes to confirm deletion, or press Enter to cancel");
         if (!answer.equalsIgnoreCase("yes")) {
             Config.info("Deletion cancelled.");
             return;
