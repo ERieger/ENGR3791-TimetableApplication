@@ -868,26 +868,19 @@ public class TimetableMode {
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
-                    writer.write(String.join(delimiter,
-                            delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
-                            delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
-                            delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
-                            delimited(cr.mode),
-                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD),
-                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD),
-                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD), delimited(EMPTY_FIELD)));
+                    writer.write(String.join(delimiter, exportDelimitedValues(
+                            timetable, cr,
+                            EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD,
+                            EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD)));
                     writer.newLine();
                     continue;
                 }
 
                 for (SessionRecord s : cr.sessions) {
-                    writer.write(String.join(delimiter,
-                            delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
-                            delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
-                            delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
-                            delimited(cr.mode), delimited(s.day), delimited(s.dayModifier),
-                            delimited(s.timeStart), delimited(s.timeEnd), delimited(s.location),
-                            delimited(s.dateStart), delimited(s.dateEnd)));
+                    writer.write(String.join(delimiter, exportDelimitedValues(
+                            timetable, cr,
+                            s.day, s.dayModifier, s.timeStart, s.timeEnd,
+                            s.location, s.dateStart, s.dateEnd)));
                     writer.newLine();
                 }
             }
@@ -990,6 +983,35 @@ public class TimetableMode {
         writer.newLine();
         writer.write("  }");
         return false;
+    }
+
+    private String[] exportDelimitedValues(GeneratedTimetable timetable,
+                                           ClassRecord cr,
+                                           String sessionDay,
+                                           String sessionDayModifier,
+                                           String sessionTimeStart,
+                                           String sessionTimeEnd,
+                                           String sessionLocation,
+                                           String sessionDateStart,
+                                           String sessionDateEnd) {
+        return new String[]{
+                delimited(timetable.name),
+                delimited(cr.topicCode),
+                delimited(cr.topicName),
+                delimited(cr.classType),
+                delimited(String.valueOf(cr.instanceNumber)),
+                delimited(cr.campus),
+                delimited(cr.semester),
+                delimited(String.valueOf(cr.offeringGroup)),
+                delimited(cr.mode),
+                delimited(sessionDay),
+                delimited(sessionDayModifier),
+                delimited(sessionTimeStart),
+                delimited(sessionTimeEnd),
+                delimited(sessionLocation),
+                delimited(sessionDateStart),
+                delimited(sessionDateEnd)
+        };
     }
 
     private String delimited(String value) {
