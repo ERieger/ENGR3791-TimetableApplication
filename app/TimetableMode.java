@@ -323,7 +323,7 @@ public class TimetableMode {
             List<List<ClassRecord>> options = buildTopicOptions(topicClasses);
             if (options.isEmpty()) return new GenerationResult(null, false);
 
-            perTopic.add(new TopicOptions(topic, options));
+            perTopic.add(new TopicOptions(options));
         }
 
         perTopic.sort(Comparator.comparingInt(t -> t.options.size()));
@@ -693,7 +693,7 @@ public class TimetableMode {
     private static class TopicOptions {
         final List<List<ClassRecord>> options;
 
-        TopicOptions(String unusedTopic, List<List<ClassRecord>> options) {
+        TopicOptions(List<List<ClassRecord>> options) {
             this.options = options;
         }
     }
