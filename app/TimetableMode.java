@@ -91,21 +91,15 @@ public class TimetableMode {
             return;
         }
 
-        int i = 1;
         List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
-        for (GeneratedTimetable t : list) {
-            Config.menuItem(String.valueOf(i), t.name + Config.dim("  (" + t.selectedClasses.size() + " classes)"));
-            i++;
-        }
+        printGeneratedTimetableItems(list);
         Config.menuItem("0", "Back");
 
         String pick = Config.menuPrompt(sc);
         if (pick.equals("0") || pick.isBlank()) return;
 
-        int idx;
-        try { idx = Integer.parseInt(pick.trim()) - 1; }
-        catch (NumberFormatException e) { Config.error("Invalid number."); return; }
-        if (idx < 0 || idx >= list.size()) { Config.error("Number out of range."); return; }
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
 
         printTimetable(list.get(idx));
     }
@@ -117,12 +111,8 @@ public class TimetableMode {
             return;
         }
 
-        int i = 1;
         List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
-        for (GeneratedTimetable t : list) {
-            Config.menuItem(String.valueOf(i), t.name + Config.dim("  (" + t.selectedClasses.size() + " classes)"));
-            i++;
-        }
+        printGeneratedTimetableItems(list);
         Config.menuItem("0", "Cancel");
 
         String pick = Config.prompt(sc, "Enter timetable number to delete");
@@ -131,10 +121,8 @@ public class TimetableMode {
             return;
         }
 
-        int idx;
-        try { idx = Integer.parseInt(pick.trim()) - 1; }
-        catch (NumberFormatException e) { Config.error("Invalid number."); return; }
-        if (idx < 0 || idx >= list.size()) { Config.error("Number out of range."); return; }
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
 
         GeneratedTimetable target = list.get(idx);
         Config.blankLine();
@@ -149,6 +137,28 @@ public class TimetableMode {
 
         generatedTimetables.remove(target.name);
         Config.success("Deleted timetable: " + target.name);
+    }
+
+    private void printGeneratedTimetableItems(List<GeneratedTimetable> list) {
+        int i = 1;
+        for (GeneratedTimetable t : list) {
+            Config.menuItem(String.valueOf(i), t.name + Config.dim("  (" + t.selectedClasses.size() + " classes)"));
+            i++;
+        }
+    }
+
+    private int parseGeneratedTimetableIndex(String input, int size) {
+        try {
+            int idx = Integer.parseInt(input.trim()) - 1;
+            if (idx < 0 || idx >= size) {
+                Config.error("Number out of range.");
+                return -1;
+            }
+            return idx;
+        } catch (NumberFormatException e) {
+            Config.error("Invalid number.");
+            return -1;
+        }
     }
 
     private TimetableSettings promptSettings(List<ClassRecord> allClasses) {
