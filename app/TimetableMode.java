@@ -468,6 +468,7 @@ public class TimetableMode {
     }
 
     private int parseMinutes(String hhmm) {
+        if (hhmm == null) return warnInvalidTime("null");
         String[] p = hhmm.split(":");
         if (p.length != 2) return warnInvalidTime(hhmm);
         try {
@@ -531,6 +532,8 @@ public class TimetableMode {
                 case WEDNESDAYS -> sessionCountByDay.getOrDefault("Wednesday", 0);
                 case THURSDAYS -> sessionCountByDay.getOrDefault("Thursday", 0);
                 case FRIDAYS -> sessionCountByDay.getOrDefault("Friday", 0);
+                // Lower variance means sessions are distributed more evenly across weekdays.
+                // Negating makes "more even" score higher; scaling preserves ordering as an integer score.
                 case EVEN_SPREAD -> Math.round(-variance * EVEN_SPREAD_SCALE);
                 case COMPACT_FEW_DAYS -> -distinctDays;
             };
@@ -622,15 +625,11 @@ public class TimetableMode {
 
     private static String canonicalDay(String day) {
         if (day == null) return null;
-        String d = day.trim().toLowerCase(Locale.ROOT);
-        return switch (d) {
-            case "monday" -> "Monday";
-            case "tuesday" -> "Tuesday";
-            case "wednesday" -> "Wednesday";
-            case "thursday" -> "Thursday";
-            case "friday" -> "Friday";
-            default -> null;
-        };
+        String d = day.trim();
+        for (String weekday : WEEKDAYS) {
+            if (weekday.equalsIgnoreCase(d)) return weekday;
+        }
+        return null;
     }
 
     private static final String[] WEEKDAYS =
