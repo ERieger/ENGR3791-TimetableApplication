@@ -25,6 +25,12 @@ public class TimetableMode {
     private static final int COMMUTE_MINUTES = 30;
     private static final int SEARCH_LIMIT = 250_000;
     private static final int VARIANCE_SCALE_FOR_INTEGER_COMPARISON = 1000;
+    private static final String[] EXPORT_COLUMNS = {
+            "timetable_name", "topic_code", "topic_name", "class_type", "instance_number",
+            "campus", "semester", "offering_group", "mode",
+            "session_day", "session_day_modifier", "session_time_start", "session_time_end",
+            "session_location", "session_date_start", "session_date_end"
+    };
 
     private final Database db;
     private final Scanner sc;
@@ -817,7 +823,7 @@ public class TimetableMode {
                 .thenComparingInt(c -> c.instanceNumber));
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write("timetable_name,topic_code,topic_name,class_type,instance_number,campus,semester,availability,mode,session_day,session_day_modifier,session_time_start,session_time_end,session_location,session_date_start,session_date_end");
+            writer.write(String.join(",", EXPORT_COLUMNS));
             writer.newLine();
 
             for (ClassRecord cr : classes) {
