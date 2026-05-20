@@ -20,7 +20,7 @@ fi
 CP=".:$(echo lib/*.jar | tr ' ' ':')"
 
 echo "Compiling..."
-javac -cp "$CP" Con.java SessionRecord.java ClassRecord.java SearchCriteria.java \
+javac -cp "$CP" Config.java SessionRecord.java ClassRecord.java SearchCriteria.java \
       Database.java ClassesView.java TimetableApp.java
 
 echo "Starting application..."
