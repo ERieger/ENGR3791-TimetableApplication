@@ -39,14 +39,16 @@ public class TimetableMode {
             Config.header("TIMETABLE MODE");
             Config.menuItem("1", "Generate timetable");
             Config.menuItem("2", "View generated timetables " + Config.dim("(this session)"));
-            Config.menuItem("3", "Delete generated timetable " + Config.dim("(this session)"));
+            Config.menuItem("3", "Edit generated timetable " + Config.dim("(this session)"));
+            Config.menuItem("4", "Delete generated timetable " + Config.dim("(this session)"));
             Config.menuItem("0", "Back to main menu");
 
             String choice = Config.menuPrompt(sc);
             switch (choice) {
                 case "1" -> generateTimetable();
                 case "2" -> browseGenerated();
-                case "3" -> deleteGenerated();
+                case "3" -> editGenerated();
+                case "4" -> deleteGenerated();
                 case "0" -> { return; }
                 default -> Config.warn("Unknown option – please try again.");
             }
@@ -137,6 +139,111 @@ public class TimetableMode {
 
         generatedTimetables.remove(target.name);
         Config.success("Deleted timetable: " + target.name);
+    }
+
+    private void editGenerated() throws Exception {
+        Config.header("EDIT GENERATED TIMETABLE");
+        if (generatedTimetables.isEmpty()) {
+            Config.warn("No generated timetables in this session yet.");
+            return;
+        }
+
+        List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
+        printGeneratedTimetableItems(list);
+        Config.menuItem("0", "Cancel");
+
+        String pick = Config.prompt(sc, "Enter timetable number to edit");
+        if (pick.equals("0") || pick.isBlank()) {
+            Config.info("Edit cancelled.");
+            return;
+        }
+
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
+
+        editGeneratedTimetable(list.get(idx));
+    }
+
+    private void editGeneratedTimetable(GeneratedTimetable timetable) throws Exception {
+        List<ClassRecord> allClasses = db.loadAllClasses();
+
+        while (true) {
+            Config.header("EDIT TIMETABLE: " + timetable.name);
+            List<ClassRecord> selected = timetable.selectedClasses;
+            if (selected.isEmpty()) {
+                Config.warn("This timetable has no selected classes.");
+                return;
+            }
+
+            selected.sort(Comparator
+                    .comparing((ClassRecord c) -> c.topicCode)
+                    .thenComparing(c -> c.classType)
+                    .thenComparingInt(c -> c.instanceNumber));
+
+            for (int i = 0; i < selected.size(); i++) {
+                ClassRecord c = selected.get(i);
+                Config.menuItem(String.valueOf(i + 1),
+                        c.topicCode + " · " + c.classType + " #" + c.instanceNumber
+                                + Config.dim("  (" + c.campus + ", " + c.semester + ", avail " + c.offeringGroup + ")"));
+            }
+            Config.menuItem("0", "Done");
+
+            String classPick = Config.prompt(sc, "Select timetable class to swap");
+            if (classPick.equals("0") || classPick.isBlank()) return;
+            int selectedIdx = parseGeneratedTimetableIndex(classPick, selected.size());
+            if (selectedIdx < 0) continue;
+
+            ClassRecord current = selected.get(selectedIdx);
+            List<ClassRecord> candidates = allClasses.stream()
+                    .filter(c -> c.topicCode.equals(current.topicCode))
+                    .filter(c -> c.classType.equalsIgnoreCase(current.classType))
+                    .filter(c -> c.classInstanceId != current.classInstanceId)
+                    .toList();
+
+            if (candidates.isEmpty()) {
+                Config.warn("No alternative class instance found for " + current.topicCode + " " + current.classType + ".");
+                continue;
+            }
+
+            Config.blankLine();
+            Config.subheader("Swap options for " + current.topicCode + " · " + current.classType);
+            for (int i = 0; i < candidates.size(); i++) {
+                ClassRecord c = candidates.get(i);
+                Config.menuItem(String.valueOf(i + 1),
+                        "#" + c.instanceNumber
+                                + Config.dim("  (" + c.campus + ", " + c.semester + ", avail " + c.offeringGroup + ")"));
+            }
+            Config.menuItem("0", "Cancel swap");
+
+            String swapPick = Config.prompt(sc, "Select replacement class instance");
+            if (swapPick.equals("0") || swapPick.isBlank()) continue;
+            int replacementIdx = parseGeneratedTimetableIndex(swapPick, candidates.size());
+            if (replacementIdx < 0) continue;
+
+            ClassRecord replacement = candidates.get(replacementIdx);
+            List<ClassRecord> others = new ArrayList<>(selected);
+            others.remove(selectedIdx);
+            boolean introducesConflict = hasConflictWithSelection(
+                    replacement, others, timetable.settings.allowLectureOverlap);
+
+            if (introducesConflict) {
+                Config.blankLine();
+                Config.warn("This swap introduces a time clash or insufficient commute time.");
+                Config.warn("You can still continue, but confirmation is required.");
+                String answer = Config.prompt(sc, "Type YES to proceed with this swap, or press Enter to cancel");
+                if (!answer.equalsIgnoreCase("yes")) {
+                    Config.info("Swap cancelled.");
+                    continue;
+                }
+            }
+
+            selected.set(selectedIdx, replacement);
+            Config.success("Swapped " + current.topicCode + " " + current.classType
+                    + " #" + current.instanceNumber + " -> #" + replacement.instanceNumber + ".");
+            Config.info("Timetable updated.");
+            Config.blankLine();
+            printTimetable(timetable);
+        }
     }
 
     private void printGeneratedTimetableItems(List<GeneratedTimetable> list) {
@@ -500,6 +607,15 @@ public class TimetableMode {
                     if (gap >= 0 && gap < COMMUTE_MINUTES) return true;
                 }
             }
+        }
+        return false;
+    }
+
+    private boolean hasConflictWithSelection(ClassRecord candidate,
+                                             List<ClassRecord> selection,
+                                             boolean allowLectureOverlap) {
+        for (ClassRecord existing : selection) {
+            if (hasConflict(existing, candidate, allowLectureOverlap)) return true;
         }
         return false;
     }
