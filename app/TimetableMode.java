@@ -867,11 +867,21 @@ public class TimetableMode {
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
+                    String emptyDay = "";
+                    String emptyDayModifier = "";
+                    String emptyTimeStart = "";
+                    String emptyTimeEnd = "";
+                    String emptyLocation = "";
+                    String emptyDateStart = "";
+                    String emptyDateEnd = "";
                     writer.write(String.join(delimiter,
                             delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
                             delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
                             delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
-                            delimited(cr.mode), delimited(""), delimited(""), delimited(""), delimited(""), delimited(""), delimited(""), delimited("")));
+                            delimited(cr.mode),
+                            delimited(emptyDay), delimited(emptyDayModifier),
+                            delimited(emptyTimeStart), delimited(emptyTimeEnd),
+                            delimited(emptyLocation), delimited(emptyDateStart), delimited(emptyDateEnd)));
                     writer.newLine();
                     continue;
                 }
@@ -905,10 +915,18 @@ public class TimetableMode {
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
+                    String emptyDay = "";
+                    String emptyDayModifier = "";
+                    String emptyTimeStart = "";
+                    String emptyTimeEnd = "";
+                    String emptyLocation = "";
+                    String emptyDateStart = "";
+                    String emptyDateEnd = "";
                     first = writeJsonRow(writer, first,
                             timetable.name, cr.topicCode, cr.topicName, cr.classType,
                             String.valueOf(cr.instanceNumber), cr.campus, cr.semester, String.valueOf(cr.offeringGroup),
-                            cr.mode, "", "", "", "", "", "", "");
+                            cr.mode,
+                            emptyDay, emptyDayModifier, emptyTimeStart, emptyTimeEnd, emptyLocation, emptyDateStart, emptyDateEnd);
                     continue;
                 }
 
@@ -950,22 +968,22 @@ public class TimetableMode {
             writer.newLine();
         }
         writer.write("  {");
-        writer.write("\"timetable_name\":" + json(timetableName) + ",");
-        writer.write("\"topic_code\":" + json(topicCode) + ",");
-        writer.write("\"topic_name\":" + json(topicName) + ",");
-        writer.write("\"class_type\":" + json(classType) + ",");
-        writer.write("\"instance_number\":" + json(instanceNumber) + ",");
-        writer.write("\"campus\":" + json(campus) + ",");
-        writer.write("\"semester\":" + json(semester) + ",");
-        writer.write("\"offering_group\":" + json(offeringGroup) + ",");
-        writer.write("\"mode\":" + json(mode) + ",");
-        writer.write("\"session_day\":" + json(sessionDay) + ",");
-        writer.write("\"session_day_modifier\":" + json(sessionDayModifier) + ",");
-        writer.write("\"session_time_start\":" + json(sessionTimeStart) + ",");
-        writer.write("\"session_time_end\":" + json(sessionTimeEnd) + ",");
-        writer.write("\"session_location\":" + json(sessionLocation) + ",");
-        writer.write("\"session_date_start\":" + json(sessionDateStart) + ",");
-        writer.write("\"session_date_end\":" + json(sessionDateEnd));
+        writer.write("\"timetable_name\": " + json(timetableName) + ",");
+        writer.write("\"topic_code\": " + json(topicCode) + ",");
+        writer.write("\"topic_name\": " + json(topicName) + ",");
+        writer.write("\"class_type\": " + json(classType) + ",");
+        writer.write("\"instance_number\": " + json(instanceNumber) + ",");
+        writer.write("\"campus\": " + json(campus) + ",");
+        writer.write("\"semester\": " + json(semester) + ",");
+        writer.write("\"offering_group\": " + json(offeringGroup) + ",");
+        writer.write("\"mode\": " + json(mode) + ",");
+        writer.write("\"session_day\": " + json(sessionDay) + ",");
+        writer.write("\"session_day_modifier\": " + json(sessionDayModifier) + ",");
+        writer.write("\"session_time_start\": " + json(sessionTimeStart) + ",");
+        writer.write("\"session_time_end\": " + json(sessionTimeEnd) + ",");
+        writer.write("\"session_location\": " + json(sessionLocation) + ",");
+        writer.write("\"session_date_start\": " + json(sessionDateStart) + ",");
+        writer.write("\"session_date_end\": " + json(sessionDateEnd));
         writer.write("}");
         return false;
     }
