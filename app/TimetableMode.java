@@ -39,12 +39,14 @@ public class TimetableMode {
             Config.header("TIMETABLE MODE");
             Config.menuItem("1", "Generate timetable");
             Config.menuItem("2", "View generated timetables " + Config.dim("(this session)"));
+            Config.menuItem("3", "Delete generated timetable " + Config.dim("(this session)"));
             Config.menuItem("0", "Back to main menu");
 
             String choice = Config.menuPrompt(sc);
             switch (choice) {
                 case "1" -> generateTimetable();
                 case "2" -> browseGenerated();
+                case "3" -> deleteGenerated();
                 case "0" -> { return; }
                 default -> Config.warn("Unknown option – please try again.");
             }
@@ -89,23 +91,74 @@ public class TimetableMode {
             return;
         }
 
-        int i = 1;
         List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
-        for (GeneratedTimetable t : list) {
-            Config.menuItem(String.valueOf(i), t.name + Config.dim("  (" + t.selectedClasses.size() + " classes)"));
-            i++;
-        }
+        printGeneratedTimetableItems(list);
         Config.menuItem("0", "Back");
 
         String pick = Config.menuPrompt(sc);
         if (pick.equals("0") || pick.isBlank()) return;
 
-        int idx;
-        try { idx = Integer.parseInt(pick.trim()) - 1; }
-        catch (NumberFormatException e) { Config.error("Invalid number."); return; }
-        if (idx < 0 || idx >= list.size()) { Config.error("Number out of range."); return; }
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
 
         printTimetable(list.get(idx));
+    }
+
+    private void deleteGenerated() {
+        Config.header("DELETE GENERATED TIMETABLE");
+        if (generatedTimetables.isEmpty()) {
+            Config.warn("No generated timetables in this session yet.");
+            return;
+        }
+
+        List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
+        printGeneratedTimetableItems(list);
+        Config.menuItem("0", "Cancel");
+
+        String pick = Config.prompt(sc, "Enter timetable number to delete");
+        if (pick.equals("0") || pick.isBlank()) {
+            Config.info("Deletion cancelled.");
+            return;
+        }
+
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
+
+        GeneratedTimetable target = list.get(idx);
+        Config.blankLine();
+        Config.warn("WARNING: You are about to permanently delete this generated timetable:");
+        Config.println(Config.b(target.name) + Config.dim("  (" + target.selectedClasses.size() + " classes)"));
+        Config.blankLine();
+        String answer = Config.prompt(sc, "Type YES to confirm deletion (case-insensitive), or press Enter to cancel");
+        if (!answer.equalsIgnoreCase("yes")) {
+            Config.info("Deletion cancelled.");
+            return;
+        }
+
+        generatedTimetables.remove(target.name);
+        Config.success("Deleted timetable: " + target.name);
+    }
+
+    private void printGeneratedTimetableItems(List<GeneratedTimetable> list) {
+        int i = 1;
+        for (GeneratedTimetable t : list) {
+            Config.menuItem(String.valueOf(i), t.name + Config.dim("  (" + t.selectedClasses.size() + " classes)"));
+            i++;
+        }
+    }
+
+    private int parseGeneratedTimetableIndex(String input, int size) {
+        try {
+            int idx = Integer.parseInt(input.trim()) - 1;
+            if (idx < 0 || idx >= size) {
+                Config.error("Number out of range.");
+                return -1;
+            }
+            return idx;
+        } catch (NumberFormatException e) {
+            Config.error("Invalid number.");
+            return -1;
+        }
     }
 
     private TimetableSettings promptSettings(List<ClassRecord> allClasses) {
