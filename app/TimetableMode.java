@@ -1021,12 +1021,29 @@ public class TimetableMode {
 
     private String json(String value) {
         String safe = value == null ? "" : value;
-        return "\"" + safe
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t") + "\"";
+        StringBuilder out = new StringBuilder(safe.length() + 8);
+        out.append('"');
+        for (int i = 0; i < safe.length(); i++) {
+            char c = safe.charAt(i);
+            switch (c) {
+                case '"' -> out.append("\\\"");
+                case '\\' -> out.append("\\\\");
+                case '\b' -> out.append("\\b");
+                case '\f' -> out.append("\\f");
+                case '\n' -> out.append("\\n");
+                case '\r' -> out.append("\\r");
+                case '\t' -> out.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        out.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        out.append(c);
+                    }
+                }
+            }
+        }
+        out.append('"');
+        return out.toString();
     }
 
     private String resolveUniqueName(String requested) {
