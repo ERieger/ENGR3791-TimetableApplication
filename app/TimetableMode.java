@@ -129,7 +129,7 @@ public class TimetableMode {
         Config.warn("WARNING: You are about to permanently delete this generated timetable:");
         Config.println(Config.b(target.name) + Config.dim("  (" + target.selectedClasses.size() + " classes)"));
         Config.blankLine();
-        String answer = Config.prompt(sc, "Type yes (any case) to confirm deletion, or press Enter to cancel");
+        String answer = Config.prompt(sc, "Type YES to confirm deletion (case-insensitive), or press Enter to cancel");
         if (!answer.equalsIgnoreCase("yes")) {
             Config.info("Deletion cancelled.");
             return;
