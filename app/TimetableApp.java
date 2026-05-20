@@ -35,6 +35,7 @@ public class TimetableApp {
         }
 
         ClassesView classesView = new ClassesView(db, sc);
+        TimetableMode timetableMode = new TimetableMode(db, sc);
 
         mainLoop:
         while (true) {
@@ -42,7 +43,7 @@ public class TimetableApp {
             Config.menuItem("1", "Import Mode        " + Config.dim("(load CSV data)"));
             Config.menuItem("2", "Classes View       " + Config.dim("(browse, view, search)"));
             Config.menuItem("3", "Search Mode        " + Config.dim("(coming soon)"));
-            Config.menuItem("4", "Timetable Mode     " + Config.dim("(coming soon)"));
+            Config.menuItem("4", "Timetable Mode     " + Config.dim("(generate timetables)"));
             Config.menuItem("0", "Exit");
 
             String choice = Config.menuPrompt(sc);
@@ -50,7 +51,7 @@ public class TimetableApp {
                 case "1" -> importMode(dbPath);
                 case "2" -> classesView.show();
                 case "3" -> Config.warn("Search Mode is not yet implemented.");
-                case "4" -> Config.warn("Timetable Mode is not yet implemented.");
+                case "4" -> timetableMode.show();
                 case "0" -> { break mainLoop; }
                 default  -> Config.warn("Unknown option – please try again.");
             }
