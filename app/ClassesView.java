@@ -37,7 +37,7 @@ public class ClassesView {
         }
     }
 
-    void showSearchMode() throws Exception {
+    public void showSearchMode() throws Exception {
         searchClasses();
     }
 
