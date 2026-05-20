@@ -22,21 +22,23 @@ public class ClassesView {
             Config.header("CLASSES VIEW");
             Config.menuItem("1", "Browse all classes");
             Config.menuItem("2", "View individual class");
-            Config.menuItem("3", "Search classes");
-            Config.menuItem("4", "Edit a class");
-            Config.menuItem("5", "Delete a class");
+            Config.menuItem("3", "Edit a class");
+            Config.menuItem("4", "Delete a class");
             Config.menuItem("0", "Back to main menu");
             String choice = Config.menuPrompt(sc);
             switch (choice) {
                 case "1" -> browseAll();
                 case "2" -> viewIndividual();
-                case "3" -> searchClasses();
-                case "4" -> editClassMenu();
-                case "5" -> deleteClassMenu();
+                case "3" -> editClassMenu();
+                case "4" -> deleteClassMenu();
                 case "0" -> { return; }
                 default  -> Config.warn("Unknown option – please try again.");
             }
         }
+    }
+
+    public void showSearchMode() throws Exception {
+        searchClasses();
     }
 
     // -------------------------------------------------------------------------
