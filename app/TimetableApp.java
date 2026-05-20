@@ -43,7 +43,7 @@ public class TimetableApp {
             Config.menuItem("1", "Import Mode        " + Config.dim("(load CSV data)"));
             Config.menuItem("2", "Classes View       " + Config.dim("(browse, view, edit, delete)"));
             Config.menuItem("3", "Search Mode        " + Config.dim("(search classes)"));
-            Config.menuItem("4", "Timetable Mode     " + Config.dim("(generate timetables)"));
+            Config.menuItem("4", "Timetable Mode     " + Config.dim("(generate, view, delete timetables)"));
             Config.menuItem("0", "Exit");
 
             String choice = Config.menuPrompt(sc);
