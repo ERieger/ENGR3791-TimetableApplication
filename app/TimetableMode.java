@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 /** Timetable generation mode (settings, generation, and result display). */
 public class TimetableMode {
 
+    private static final String BEDFORD_PARK_CAMPUS = "Bedford Park";
+    private static final String TONSLEY_CAMPUS = "Tonsley";
     private static final String CITY_CAMPUS = "Flinders City Campus";
     private static final int COMMUTE_MINUTES = 30;
     private static final int SEARCH_LIMIT = 250_000;
-    private static final int EVEN_SPREAD_SCALE = 1000;
+    private static final int VARIANCE_SCALE_FOR_INTEGER_COMPARISON = 1000;
 
     private final Database db;
     private final Scanner sc;
@@ -521,8 +523,8 @@ public class TimetableMode {
         for (int i = 0; i < preferences.size(); i++) {
             Preference p = preferences.get(i);
             values[i] = switch (p) {
-                case BEDFORD_PARK -> classCountByCampus.getOrDefault("Bedford Park", 0);
-                case TONSLEY -> classCountByCampus.getOrDefault("Tonsley", 0);
+                case BEDFORD_PARK -> classCountByCampus.getOrDefault(BEDFORD_PARK_CAMPUS, 0);
+                case TONSLEY -> classCountByCampus.getOrDefault(TONSLEY_CAMPUS, 0);
                 case FLINDERS_CITY_CAMPUS -> classCountByCampus.getOrDefault(CITY_CAMPUS, 0);
                 case ALL_SAME_CAMPUS -> classCountByCampus.size() == 1 ? 1 : 0;
                 case MORNINGS -> morning;
@@ -533,8 +535,8 @@ public class TimetableMode {
                 case THURSDAYS -> sessionCountByDay.getOrDefault("Thursday", 0);
                 case FRIDAYS -> sessionCountByDay.getOrDefault("Friday", 0);
                 // Lower variance means sessions are distributed more evenly across weekdays.
-                // Negating makes "more even" score higher; scaling preserves ordering as an integer score.
-                case EVEN_SPREAD -> Math.round(-variance * EVEN_SPREAD_SCALE);
+                // Negating makes "more even" score higher; scaling preserves decimal precision for lexicographic int scoring.
+                case EVEN_SPREAD -> Math.round(-variance * VARIANCE_SCALE_FOR_INTEGER_COMPARISON);
                 case COMPACT_FEW_DAYS -> -distinctDays;
             };
         }
@@ -636,9 +638,9 @@ public class TimetableMode {
             new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
 
     private enum Preference {
-        BEDFORD_PARK("Bedford Park"),
-        TONSLEY("Tonsley"),
-        FLINDERS_CITY_CAMPUS("Flinders City Campus"),
+        BEDFORD_PARK(BEDFORD_PARK_CAMPUS),
+        TONSLEY(TONSLEY_CAMPUS),
+        FLINDERS_CITY_CAMPUS(CITY_CAMPUS),
         ALL_SAME_CAMPUS("All at the same campus"),
         MORNINGS("Mornings"),
         AFTERNOONS("Afternoons"),
@@ -683,7 +685,7 @@ public class TimetableMode {
             return new TimetableSettings("",
                     new LinkedHashSet<>(Arrays.asList("S1", "S2")),
                     new LinkedHashSet<>(),
-                    new LinkedHashSet<>(Arrays.asList("Bedford Park", "Tonsley", CITY_CAMPUS)),
+                    new LinkedHashSet<>(Arrays.asList(BEDFORD_PARK_CAMPUS, TONSLEY_CAMPUS, CITY_CAMPUS)),
                     false,
                     new ArrayList<>());
         }
