@@ -175,7 +175,11 @@ public class TimetableMode {
         if (idx < 0) return;
 
         GeneratedTimetable target = list.get(idx);
-        String defaultFile = target.name.trim().replaceAll("[^a-zA-Z0-9._-]+", "_") + ".csv";
+        String sanitizedBase = target.name.trim()
+                .replaceAll("[^a-zA-Z0-9_-]+", "_")
+                .replaceAll("^_+|_+$", "");
+        if (sanitizedBase.isBlank()) sanitizedBase = "timetable";
+        String defaultFile = sanitizedBase + ".csv";
         String pathInput = Config.prompt(sc, "Output file path [default: " + defaultFile + "]");
         String outputPath = pathInput.isBlank() ? defaultFile : pathInput;
 
