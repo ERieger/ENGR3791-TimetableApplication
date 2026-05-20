@@ -17,6 +17,7 @@ public class TimetableMode {
     private static final String CITY_CAMPUS = "Flinders City Campus";
     private static final int COMMUTE_MINUTES = 30;
     private static final int SEARCH_LIMIT = 250_000;
+    private static final int EVEN_SPREAD_SCALE = 1000;
 
     private final Database db;
     private final Scanner sc;
@@ -24,6 +25,7 @@ public class TimetableMode {
     private TimetableSettings lastSettings = TimetableSettings.defaults();
     private final Map<String, GeneratedTimetable> generatedTimetables = new LinkedHashMap<>();
     private int autoNameCounter = 1;
+    private boolean invalidTimeWarned = false;
 
     TimetableMode(Database db, Scanner sc) {
         this.db = db;
@@ -53,6 +55,7 @@ public class TimetableMode {
             Config.warn("No class data found. Import data first.");
             return;
         }
+        invalidTimeWarned = false;
 
         TimetableSettings settings = promptSettings(allClasses);
         if (settings == null) return;
@@ -428,6 +431,7 @@ public class TimetableMode {
                 int saEnd   = parseMinutes(sa.timeEnd);
                 int sbStart = parseMinutes(sb.timeStart);
                 int sbEnd   = parseMinutes(sb.timeEnd);
+                if (saStart < 0 || saEnd < 0 || sbStart < 0 || sbEnd < 0) return true;
 
                 if (saStart < sbEnd && sbStart < saEnd) {
                     if (allowLectureOverlap && (isLecture(a.classType) || isLecture(b.classType))) {
@@ -463,14 +467,22 @@ public class TimetableMode {
         return CITY_CAMPUS.equalsIgnoreCase(campus);
     }
 
-    private static int parseMinutes(String hhmm) {
+    private int parseMinutes(String hhmm) {
         String[] p = hhmm.split(":");
-        if (p.length != 2) return -1;
+        if (p.length != 2) return warnInvalidTime(hhmm);
         try {
             return Integer.parseInt(p[0].trim()) * 60 + Integer.parseInt(p[1].trim());
         } catch (NumberFormatException e) {
-            return -1;
+            return warnInvalidTime(hhmm);
         }
+    }
+
+    private int warnInvalidTime(String value) {
+        if (!invalidTimeWarned) {
+            Config.warn("Encountered invalid class time value: " + value + ".");
+            invalidTimeWarned = true;
+        }
+        return -1;
     }
 
     private long[] score(List<ClassRecord> classes, List<Preference> preferences) {
@@ -511,7 +523,7 @@ public class TimetableMode {
                 case BEDFORD_PARK -> classCountByCampus.getOrDefault("Bedford Park", 0);
                 case TONSLEY -> classCountByCampus.getOrDefault("Tonsley", 0);
                 case FLINDERS_CITY_CAMPUS -> classCountByCampus.getOrDefault(CITY_CAMPUS, 0);
-                case ALL_SAME_CAMPUS -> classCountByCampus.size() <= 1 ? 1 : 0;
+                case ALL_SAME_CAMPUS -> classCountByCampus.size() == 1 ? 1 : 0;
                 case MORNINGS -> morning;
                 case AFTERNOONS -> afternoon;
                 case MONDAYS -> sessionCountByDay.getOrDefault("Monday", 0);
@@ -519,7 +531,7 @@ public class TimetableMode {
                 case WEDNESDAYS -> sessionCountByDay.getOrDefault("Wednesday", 0);
                 case THURSDAYS -> sessionCountByDay.getOrDefault("Thursday", 0);
                 case FRIDAYS -> sessionCountByDay.getOrDefault("Friday", 0);
-                case EVEN_SPREAD -> Math.round(-variance * 1000);
+                case EVEN_SPREAD -> Math.round(-variance * EVEN_SPREAD_SCALE);
                 case COMPACT_FEW_DAYS -> -distinctDays;
             };
         }
