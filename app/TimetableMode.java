@@ -25,6 +25,7 @@ public class TimetableMode {
     private static final int COMMUTE_MINUTES = 30;
     private static final int SEARCH_LIMIT = 250_000;
     private static final int VARIANCE_SCALE_FOR_INTEGER_COMPARISON = 1000;
+    private static final String EMPTY_FIELD = "";
     private static final String[] EXPORT_COLUMNS = {
             "timetable_name", "topic_code", "topic_name", "class_type", "instance_number",
             "campus", "semester", "offering_group", "mode",
@@ -867,21 +868,14 @@ public class TimetableMode {
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
-                    String emptyDay = "";
-                    String emptyDayModifier = "";
-                    String emptyTimeStart = "";
-                    String emptyTimeEnd = "";
-                    String emptyLocation = "";
-                    String emptyDateStart = "";
-                    String emptyDateEnd = "";
                     writer.write(String.join(delimiter,
                             delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
                             delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
                             delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
                             delimited(cr.mode),
-                            delimited(emptyDay), delimited(emptyDayModifier),
-                            delimited(emptyTimeStart), delimited(emptyTimeEnd),
-                            delimited(emptyLocation), delimited(emptyDateStart), delimited(emptyDateEnd)));
+                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD),
+                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD),
+                            delimited(EMPTY_FIELD), delimited(EMPTY_FIELD), delimited(EMPTY_FIELD)));
                     writer.newLine();
                     continue;
                 }
@@ -915,18 +909,11 @@ public class TimetableMode {
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
-                    String emptyDay = "";
-                    String emptyDayModifier = "";
-                    String emptyTimeStart = "";
-                    String emptyTimeEnd = "";
-                    String emptyLocation = "";
-                    String emptyDateStart = "";
-                    String emptyDateEnd = "";
                     first = writeJsonRow(writer, first,
                             timetable.name, cr.topicCode, cr.topicName, cr.classType,
                             String.valueOf(cr.instanceNumber), cr.campus, cr.semester, String.valueOf(cr.offeringGroup),
                             cr.mode,
-                            emptyDay, emptyDayModifier, emptyTimeStart, emptyTimeEnd, emptyLocation, emptyDateStart, emptyDateEnd);
+                            EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD, EMPTY_FIELD);
                     continue;
                 }
 
@@ -968,23 +955,40 @@ public class TimetableMode {
             writer.newLine();
         }
         writer.write("  {");
-        writer.write("\"timetable_name\": " + json(timetableName) + ",");
-        writer.write("\"topic_code\": " + json(topicCode) + ",");
-        writer.write("\"topic_name\": " + json(topicName) + ",");
-        writer.write("\"class_type\": " + json(classType) + ",");
-        writer.write("\"instance_number\": " + json(instanceNumber) + ",");
-        writer.write("\"campus\": " + json(campus) + ",");
-        writer.write("\"semester\": " + json(semester) + ",");
-        writer.write("\"offering_group\": " + json(offeringGroup) + ",");
-        writer.write("\"mode\": " + json(mode) + ",");
-        writer.write("\"session_day\": " + json(sessionDay) + ",");
-        writer.write("\"session_day_modifier\": " + json(sessionDayModifier) + ",");
-        writer.write("\"session_time_start\": " + json(sessionTimeStart) + ",");
-        writer.write("\"session_time_end\": " + json(sessionTimeEnd) + ",");
-        writer.write("\"session_location\": " + json(sessionLocation) + ",");
-        writer.write("\"session_date_start\": " + json(sessionDateStart) + ",");
-        writer.write("\"session_date_end\": " + json(sessionDateEnd));
-        writer.write("}");
+        writer.newLine();
+        writer.write("    \"timetable_name\": " + json(timetableName) + ",");
+        writer.newLine();
+        writer.write("    \"topic_code\": " + json(topicCode) + ",");
+        writer.newLine();
+        writer.write("    \"topic_name\": " + json(topicName) + ",");
+        writer.newLine();
+        writer.write("    \"class_type\": " + json(classType) + ",");
+        writer.newLine();
+        writer.write("    \"instance_number\": " + json(instanceNumber) + ",");
+        writer.newLine();
+        writer.write("    \"campus\": " + json(campus) + ",");
+        writer.newLine();
+        writer.write("    \"semester\": " + json(semester) + ",");
+        writer.newLine();
+        writer.write("    \"offering_group\": " + json(offeringGroup) + ",");
+        writer.newLine();
+        writer.write("    \"mode\": " + json(mode) + ",");
+        writer.newLine();
+        writer.write("    \"session_day\": " + json(sessionDay) + ",");
+        writer.newLine();
+        writer.write("    \"session_day_modifier\": " + json(sessionDayModifier) + ",");
+        writer.newLine();
+        writer.write("    \"session_time_start\": " + json(sessionTimeStart) + ",");
+        writer.newLine();
+        writer.write("    \"session_time_end\": " + json(sessionTimeEnd) + ",");
+        writer.newLine();
+        writer.write("    \"session_location\": " + json(sessionLocation) + ",");
+        writer.newLine();
+        writer.write("    \"session_date_start\": " + json(sessionDateStart) + ",");
+        writer.newLine();
+        writer.write("    \"session_date_end\": " + json(sessionDateEnd));
+        writer.newLine();
+        writer.write("  }");
         return false;
     }
 
