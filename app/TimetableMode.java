@@ -52,7 +52,7 @@ public class TimetableMode {
             Config.menuItem("2", "View generated timetables " + Config.dim("(this session)"));
             Config.menuItem("3", "Edit generated timetable " + Config.dim("(this session)"));
             Config.menuItem("4", "Delete generated timetable " + Config.dim("(this session)"));
-            Config.menuItem("5", "Export generated timetable " + Config.dim("(CSV file)"));
+            Config.menuItem("5", "Export generated timetable " + Config.dim("(CSV/TSV/JSON)"));
             Config.menuItem("0", "Back to main menu");
 
             String choice = Config.menuPrompt(sc);
@@ -179,16 +179,43 @@ public class TimetableMode {
                 .replaceAll("[^a-zA-Z0-9_-]+", "_")
                 .replaceAll("^_+|_+$", "");
         if (sanitizedBase.isBlank()) sanitizedBase = "timetable";
-        String defaultFile = sanitizedBase + ".csv";
+        ExportFormat format = promptExportFormat();
+        if (format == null) {
+            Config.info("Export cancelled.");
+            return;
+        }
+
+        String defaultFile = sanitizedBase + format.extension;
         String pathInput = Config.prompt(sc, "Output file path [default: " + defaultFile + "]");
         String outputPath = pathInput.isBlank() ? defaultFile : pathInput;
 
         try {
-            Path exported = writeTimetableCsv(target, outputPath);
+            Path exported = writeTimetable(target, outputPath, format);
             Config.success("Exported timetable to: " + exported);
         } catch (IOException e) {
             Config.error("Failed to export timetable: " + e.getMessage());
         }
+    }
+
+    private ExportFormat promptExportFormat() {
+        Config.blankLine();
+        Config.println("Choose export format:");
+        Config.menuItem("1", "CSV (.csv)");
+        Config.menuItem("2", "TSV (.tsv)");
+        Config.menuItem("3", "JSON (.json)");
+        Config.menuItem("0", "Cancel");
+
+        String choice = Config.menuPrompt(sc);
+        return switch (choice) {
+            case "1" -> ExportFormat.CSV;
+            case "2" -> ExportFormat.TSV;
+            case "3" -> ExportFormat.JSON;
+            case "0", "" -> null;
+            default -> {
+                Config.warn("Unknown format option.");
+                yield null;
+            }
+        };
     }
 
     private void editGenerated() throws Exception {
@@ -815,11 +842,19 @@ public class TimetableMode {
         Config.blankLine();
     }
 
-    private Path writeTimetableCsv(GeneratedTimetable timetable, String outputPath) throws IOException {
+    private Path writeTimetable(GeneratedTimetable timetable, String outputPath, ExportFormat format) throws IOException {
         Path path = Paths.get(outputPath).toAbsolutePath().normalize();
         Path parent = path.getParent();
         if (parent != null) Files.createDirectories(parent);
 
+        return switch (format) {
+            case CSV -> writeTimetableDelimited(timetable, path, ",");
+            case TSV -> writeTimetableDelimited(timetable, path, "\t");
+            case JSON -> writeTimetableJson(timetable, path);
+        };
+    }
+
+    private Path writeTimetableDelimited(GeneratedTimetable timetable, Path path, String delimiter) throws IOException {
         List<ClassRecord> classes = new ArrayList<>(timetable.selectedClasses);
         classes.sort(Comparator
                 .comparing((ClassRecord c) -> c.topicCode)
@@ -827,28 +862,28 @@ public class TimetableMode {
                 .thenComparingInt(c -> c.instanceNumber));
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write(String.join(",", EXPORT_COLUMNS));
+            writer.write(String.join(delimiter, EXPORT_COLUMNS));
             writer.newLine();
 
             for (ClassRecord cr : classes) {
                 if (cr.sessions.isEmpty()) {
-                    writer.write(String.join(",",
-                            csv(timetable.name), csv(cr.topicCode), csv(cr.topicName),
-                            csv(cr.classType), csv(String.valueOf(cr.instanceNumber)),
-                            csv(cr.campus), csv(cr.semester), csv(String.valueOf(cr.offeringGroup)),
-                            csv(cr.mode), csv(""), csv(""), csv(""), csv(""), csv(""), csv(""), csv("")));
+                    writer.write(String.join(delimiter,
+                            delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
+                            delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
+                            delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
+                            delimited(cr.mode), delimited(""), delimited(""), delimited(""), delimited(""), delimited(""), delimited(""), delimited("")));
                     writer.newLine();
                     continue;
                 }
 
                 for (SessionRecord s : cr.sessions) {
-                    writer.write(String.join(",",
-                            csv(timetable.name), csv(cr.topicCode), csv(cr.topicName),
-                            csv(cr.classType), csv(String.valueOf(cr.instanceNumber)),
-                            csv(cr.campus), csv(cr.semester), csv(String.valueOf(cr.offeringGroup)),
-                            csv(cr.mode), csv(s.day), csv(s.dayModifier),
-                            csv(s.timeStart), csv(s.timeEnd), csv(s.location),
-                            csv(s.dateStart), csv(s.dateEnd)));
+                    writer.write(String.join(delimiter,
+                            delimited(timetable.name), delimited(cr.topicCode), delimited(cr.topicName),
+                            delimited(cr.classType), delimited(String.valueOf(cr.instanceNumber)),
+                            delimited(cr.campus), delimited(cr.semester), delimited(String.valueOf(cr.offeringGroup)),
+                            delimited(cr.mode), delimited(s.day), delimited(s.dayModifier),
+                            delimited(s.timeStart), delimited(s.timeEnd), delimited(s.location),
+                            delimited(s.dateStart), delimited(s.dateEnd)));
                     writer.newLine();
                 }
             }
@@ -856,9 +891,98 @@ public class TimetableMode {
         return path;
     }
 
-    private String csv(String value) {
+    private Path writeTimetableJson(GeneratedTimetable timetable, Path path) throws IOException {
+        List<ClassRecord> classes = new ArrayList<>(timetable.selectedClasses);
+        classes.sort(Comparator
+                .comparing((ClassRecord c) -> c.topicCode)
+                .thenComparing(c -> c.classType)
+                .thenComparingInt(c -> c.instanceNumber));
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            writer.write("[");
+            writer.newLine();
+            boolean first = true;
+
+            for (ClassRecord cr : classes) {
+                if (cr.sessions.isEmpty()) {
+                    first = writeJsonRow(writer, first,
+                            timetable.name, cr.topicCode, cr.topicName, cr.classType,
+                            String.valueOf(cr.instanceNumber), cr.campus, cr.semester, String.valueOf(cr.offeringGroup),
+                            cr.mode, "", "", "", "", "", "", "");
+                    continue;
+                }
+
+                for (SessionRecord s : cr.sessions) {
+                    first = writeJsonRow(writer, first,
+                            timetable.name, cr.topicCode, cr.topicName, cr.classType,
+                            String.valueOf(cr.instanceNumber), cr.campus, cr.semester, String.valueOf(cr.offeringGroup),
+                            cr.mode, s.day, s.dayModifier, s.timeStart, s.timeEnd, s.location, s.dateStart, s.dateEnd);
+                }
+            }
+
+            writer.newLine();
+            writer.write("]");
+            writer.newLine();
+        }
+        return path;
+    }
+
+    private boolean writeJsonRow(BufferedWriter writer,
+                                 boolean first,
+                                 String timetableName,
+                                 String topicCode,
+                                 String topicName,
+                                 String classType,
+                                 String instanceNumber,
+                                 String campus,
+                                 String semester,
+                                 String offeringGroup,
+                                 String mode,
+                                 String sessionDay,
+                                 String sessionDayModifier,
+                                 String sessionTimeStart,
+                                 String sessionTimeEnd,
+                                 String sessionLocation,
+                                 String sessionDateStart,
+                                 String sessionDateEnd) throws IOException {
+        if (!first) {
+            writer.write(",");
+            writer.newLine();
+        }
+        writer.write("  {");
+        writer.write("\"timetable_name\":" + json(timetableName) + ",");
+        writer.write("\"topic_code\":" + json(topicCode) + ",");
+        writer.write("\"topic_name\":" + json(topicName) + ",");
+        writer.write("\"class_type\":" + json(classType) + ",");
+        writer.write("\"instance_number\":" + json(instanceNumber) + ",");
+        writer.write("\"campus\":" + json(campus) + ",");
+        writer.write("\"semester\":" + json(semester) + ",");
+        writer.write("\"offering_group\":" + json(offeringGroup) + ",");
+        writer.write("\"mode\":" + json(mode) + ",");
+        writer.write("\"session_day\":" + json(sessionDay) + ",");
+        writer.write("\"session_day_modifier\":" + json(sessionDayModifier) + ",");
+        writer.write("\"session_time_start\":" + json(sessionTimeStart) + ",");
+        writer.write("\"session_time_end\":" + json(sessionTimeEnd) + ",");
+        writer.write("\"session_location\":" + json(sessionLocation) + ",");
+        writer.write("\"session_date_start\":" + json(sessionDateStart) + ",");
+        writer.write("\"session_date_end\":" + json(sessionDateEnd));
+        writer.write("}");
+        return false;
+    }
+
+    private String delimited(String value) {
         String safe = value == null ? "" : value;
         return "\"" + safe.replace("\"", "\"\"") + "\"";
+    }
+
+    private String json(String value) {
+        String safe = value == null ? "" : value;
+        return "\"" + safe
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t") + "\"";
     }
 
     private String resolveUniqueName(String requested) {
@@ -911,6 +1035,18 @@ public class TimetableMode {
 
         Preference(String label) {
             this.label = label;
+        }
+    }
+
+    private enum ExportFormat {
+        CSV(".csv"),
+        TSV(".tsv"),
+        JSON(".json");
+
+        final String extension;
+
+        ExportFormat(String extension) {
+            this.extension = extension;
         }
     }
 
