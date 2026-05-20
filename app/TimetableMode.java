@@ -1,3 +1,8 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -41,6 +46,7 @@ public class TimetableMode {
             Config.menuItem("2", "View generated timetables " + Config.dim("(this session)"));
             Config.menuItem("3", "Edit generated timetable " + Config.dim("(this session)"));
             Config.menuItem("4", "Delete generated timetable " + Config.dim("(this session)"));
+            Config.menuItem("5", "Export generated timetable " + Config.dim("(CSV file)"));
             Config.menuItem("0", "Back to main menu");
 
             String choice = Config.menuPrompt(sc);
@@ -49,6 +55,7 @@ public class TimetableMode {
                 case "2" -> browseGenerated();
                 case "3" -> editGenerated();
                 case "4" -> deleteGenerated();
+                case "5" -> exportGenerated();
                 case "0" -> { return; }
                 default -> Config.warn("Unknown option – please try again.");
             }
@@ -139,6 +146,39 @@ public class TimetableMode {
 
         generatedTimetables.remove(target.name);
         Config.success("Deleted timetable: " + target.name);
+    }
+
+    private void exportGenerated() {
+        Config.header("EXPORT GENERATED TIMETABLE");
+        if (generatedTimetables.isEmpty()) {
+            Config.warn("No generated timetables in this session yet.");
+            return;
+        }
+
+        List<GeneratedTimetable> list = new ArrayList<>(generatedTimetables.values());
+        printGeneratedTimetableItems(list);
+        Config.menuItem("0", "Cancel");
+
+        String pick = Config.prompt(sc, "Enter timetable number to export");
+        if (pick.equals("0") || pick.isBlank()) {
+            Config.info("Export cancelled.");
+            return;
+        }
+
+        int idx = parseGeneratedTimetableIndex(pick, list.size());
+        if (idx < 0) return;
+
+        GeneratedTimetable target = list.get(idx);
+        String defaultFile = target.name.trim().replaceAll("[^a-zA-Z0-9._-]+", "_") + ".csv";
+        String pathInput = Config.prompt(sc, "Output file path [default: " + defaultFile + "]");
+        String outputPath = pathInput.isBlank() ? defaultFile : pathInput;
+
+        try {
+            Path exported = writeTimetableCsv(target, outputPath);
+            Config.success("Exported timetable to: " + exported);
+        } catch (IOException e) {
+            Config.error("Failed to export timetable: " + e.getMessage());
+        }
     }
 
     private void editGenerated() throws Exception {
@@ -763,6 +803,52 @@ public class TimetableMode {
 
         Config.success("Generated timetable with " + classes.size() + " selected class instance(s).");
         Config.blankLine();
+    }
+
+    private Path writeTimetableCsv(GeneratedTimetable timetable, String outputPath) throws IOException {
+        Path path = Paths.get(outputPath).toAbsolutePath().normalize();
+        Path parent = path.getParent();
+        if (parent != null) Files.createDirectories(parent);
+
+        List<ClassRecord> classes = new ArrayList<>(timetable.selectedClasses);
+        classes.sort(Comparator
+                .comparing((ClassRecord c) -> c.topicCode)
+                .thenComparing(c -> c.classType)
+                .thenComparingInt(c -> c.instanceNumber));
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            writer.write("timetable_name,topic_code,topic_name,class_type,instance_number,campus,semester,availability,mode,session_day,session_day_modifier,session_time_start,session_time_end,session_location,session_date_start,session_date_end");
+            writer.newLine();
+
+            for (ClassRecord cr : classes) {
+                if (cr.sessions.isEmpty()) {
+                    writer.write(String.join(",",
+                            csv(timetable.name), csv(cr.topicCode), csv(cr.topicName),
+                            csv(cr.classType), csv(String.valueOf(cr.instanceNumber)),
+                            csv(cr.campus), csv(cr.semester), csv(String.valueOf(cr.offeringGroup)),
+                            csv(cr.mode), csv(""), csv(""), csv(""), csv(""), csv(""), csv(""), csv("")));
+                    writer.newLine();
+                    continue;
+                }
+
+                for (SessionRecord s : cr.sessions) {
+                    writer.write(String.join(",",
+                            csv(timetable.name), csv(cr.topicCode), csv(cr.topicName),
+                            csv(cr.classType), csv(String.valueOf(cr.instanceNumber)),
+                            csv(cr.campus), csv(cr.semester), csv(String.valueOf(cr.offeringGroup)),
+                            csv(cr.mode), csv(s.day), csv(s.dayModifier),
+                            csv(s.timeStart), csv(s.timeEnd), csv(s.location),
+                            csv(s.dateStart), csv(s.dateEnd)));
+                    writer.newLine();
+                }
+            }
+        }
+        return path;
+    }
+
+    private String csv(String value) {
+        String safe = value == null ? "" : value;
+        return "\"" + safe.replace("\"", "\"\"") + "\"";
     }
 
     private String resolveUniqueName(String requested) {
