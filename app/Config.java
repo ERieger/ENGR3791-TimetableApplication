@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 /** ANSI console formatting helpers. */
-public class Con {
+public class Config {
     static final String R   = "\033[0m";
     static final String BD  = "\033[1m";
     static final String DM  = "\033[2m";
