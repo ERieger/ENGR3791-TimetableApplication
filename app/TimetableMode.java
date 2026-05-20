@@ -26,6 +26,7 @@ public class TimetableMode {
     private static final int SEARCH_LIMIT = 250_000;
     private static final int VARIANCE_SCALE_FOR_INTEGER_COMPARISON = 1000;
     private static final String EMPTY_FIELD = "";
+    private static final Path DEFAULT_EXPORT_DIR = Paths.get("..", "Exported Timetables");
     private static final String[] EXPORT_COLUMNS = {
             "timetable_name", "topic_code", "topic_name", "class_type", "instance_number",
             "campus", "semester", "offering_group", "mode",
@@ -186,7 +187,7 @@ public class TimetableMode {
             return;
         }
 
-        String defaultFile = sanitizedBase + format.extension;
+        String defaultFile = DEFAULT_EXPORT_DIR.resolve(sanitizedBase + format.extension).toString();
         String pathInput = Config.prompt(sc, "Output file path [default: " + defaultFile + "]");
         String outputPath = pathInput.isBlank() ? defaultFile : pathInput;
 
