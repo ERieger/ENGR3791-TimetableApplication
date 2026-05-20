@@ -11,6 +11,7 @@ public class Database {
         try (Statement s = conn.createStatement()) {
             s.execute("PRAGMA foreign_keys = ON");
         }
+        ensureSchema();
     }
 
     void close() {
@@ -336,6 +337,58 @@ public class Database {
             ps.setInt(1, param);
             ResultSet rs = ps.executeQuery();
             return rs.next() ? rs.getString(1) : null;
+        }
+    }
+
+    /** Ensures required tables exist so the app can start with an empty database file. */
+    private void ensureSchema() throws SQLException {
+        try (Statement s = conn.createStatement()) {
+            s.execute("""
+                    CREATE TABLE IF NOT EXISTS campuses (
+                        campus_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campus_name TEXT NOT NULL UNIQUE
+                    )""");
+
+            s.execute("""
+                    CREATE TABLE IF NOT EXISTS topics (
+                        topic_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+                        topic_code TEXT NOT NULL UNIQUE,
+                        topic_name TEXT NOT NULL
+                    )""");
+
+            s.execute("""
+                    CREATE TABLE IF NOT EXISTS topic_offerings (
+                        offering_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                        topic_id       INTEGER NOT NULL REFERENCES topics(topic_id),
+                        campus_id      INTEGER NOT NULL REFERENCES campuses(campus_id),
+                        mode           TEXT    NOT NULL,
+                        semester       TEXT    NOT NULL,
+                        offering_group INTEGER NOT NULL,
+                        UNIQUE(topic_id, campus_id, semester, offering_group)
+                    )""");
+
+            s.execute("""
+                    CREATE TABLE IF NOT EXISTS class_instances (
+                        class_instance_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        offering_id       INTEGER NOT NULL REFERENCES topic_offerings(offering_id),
+                        class_type        TEXT    NOT NULL,
+                        instance_number   INTEGER NOT NULL,
+                        UNIQUE(offering_id, class_type, instance_number)
+                    )""");
+
+            s.execute("""
+                    CREATE TABLE IF NOT EXISTS class_sessions (
+                        session_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                        class_instance_id INTEGER NOT NULL REFERENCES class_instances(class_instance_id),
+                        date_start        TEXT NOT NULL,
+                        date_end          TEXT NOT NULL,
+                        day               TEXT NOT NULL,
+                        day_modifier      TEXT,
+                        time_start        TEXT NOT NULL,
+                        time_end          TEXT NOT NULL,
+                        location          TEXT NOT NULL,
+                        UNIQUE(class_instance_id, date_start, date_end, day, time_start, time_end, location)
+                    )""");
         }
     }
 
