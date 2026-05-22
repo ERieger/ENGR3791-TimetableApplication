@@ -1,0 +1,8 @@
+timetable_name,topic_code,topic_name,class_type,instance_number,campus,semester,offering_group,mode,session_day,session_day_modifier,session_time_start,session_time_end,session_location,session_date_start,session_date_end
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Laboratory","1","Bedford Park","S1","1","In person","Wednesday","","14:00","16:00","Info Sci & Tech, 301 BYOD Computer Lab","11 Mar","08 Apr"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Laboratory","1","Bedford Park","S1","1","In person","Wednesday","","14:00","16:00","Info Sci & Tech, 301 BYOD Computer Lab","29 Apr","10 Jun"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Lecture","1","Bedford Park","S1","1","In person","Monday","","15:00","17:00","South Lec Theatres, STH2 South Theatre 2","16 Mar","30 Mar"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Lecture","1","Bedford Park","S1","1","In person","Monday","","15:00","17:00","South Lec Theatres, STH2 South Theatre 2","27 Apr","01 Jun"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Lecture","1","Bedford Park","S1","1","In person","Monday","once-only","15:00","17:00","South Lec Theatres, STH2 South Theatre 2","02 Mar","02 Mar"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Lecture","1","Bedford Park","S1","1","In person","Tuesday","once-only","08:00","10:00","South Lec Theatres, STH2 South Theatre 2","10 Mar","10 Mar"
+"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Lecture","1","Bedford Park","S1","1","In person","Tuesday","once-only","08:00","10:00","Humanities, NTH2 North Theatre 2","07 Apr","07 Apr"
