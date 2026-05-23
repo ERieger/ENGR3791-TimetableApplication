@@ -380,7 +380,7 @@ public class Database {
             action.run();
             conn.commit();
         } catch (SQLException e) {
-            if (previousAutoCommit) conn.rollback();
+            try { conn.rollback(); } catch (SQLException ignored) {}
             throw e;
         } finally {
             conn.setAutoCommit(previousAutoCommit);
