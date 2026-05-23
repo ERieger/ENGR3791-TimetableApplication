@@ -83,12 +83,12 @@ final class CsvParsingUtils {
         throw new IllegalArgumentException("None of these columns found: " + Arrays.toString(candidates));
     }
 
-    static int parseInt(String value, Path file, int rowIndex) {
+    static int parseInt(String text, Path file, int rowIndex) {
         try {
-            return Integer.parseInt(value.trim());
+            return Integer.parseInt(text.trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    String.format("Expected integer at row %d of %s, got: '%s'", rowIndex, file.getFileName(), value));
+                    String.format("Expected integer at row %d of %s, got: '%s'", rowIndex, file.getFileName(), text));
         }
     }
 }

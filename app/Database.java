@@ -375,17 +375,15 @@ public class Database {
 
     private void runInTransaction(SqlAction action) throws SQLException {
         boolean previousAutoCommit = conn.getAutoCommit();
-        boolean autoCommitChanged = false;
         try {
             conn.setAutoCommit(false);
-            autoCommitChanged = true;
             action.run();
             conn.commit();
         } catch (SQLException e) {
-            if (autoCommitChanged) conn.rollback();
+            if (previousAutoCommit) conn.rollback();
             throw e;
         } finally {
-            if (autoCommitChanged) conn.setAutoCommit(previousAutoCommit);
+            conn.setAutoCommit(previousAutoCommit);
         }
     }
 

@@ -11,9 +11,10 @@ final class TextUtils {
     }
 
     static int parseIntOrZero(String value) {
+        if (value == null) return 0;
         try {
             return Integer.parseInt(value.trim());
-        } catch (Exception ignored) {
+        } catch (NumberFormatException ignored) {
             return 0;
         }
     }
