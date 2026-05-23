@@ -33,6 +33,10 @@ public class TimetableMode {
             "session_day", "session_day_modifier", "session_time_start", "session_time_end",
             "session_location", "session_date_start", "session_date_end"
     };
+    private static final Comparator<ClassRecord> CLASS_SORT_ORDER = Comparator
+            .comparing((ClassRecord c) -> c.topicCode)
+            .thenComparing(c -> c.classType)
+            .thenComparingInt(c -> c.instanceNumber);
 
     private final Database db;
     private final Scanner sc;
@@ -254,10 +258,7 @@ public class TimetableMode {
                 return;
             }
 
-            selected.sort(Comparator
-                    .comparing((ClassRecord c) -> c.topicCode)
-                    .thenComparing(c -> c.classType)
-                    .thenComparingInt(c -> c.instanceNumber));
+            selected.sort(CLASS_SORT_ORDER);
 
             for (int i = 0; i < selected.size(); i++) {
                 ClassRecord c = selected.get(i);
@@ -814,11 +815,7 @@ public class TimetableMode {
         Config.blankLine();
         Config.subheader("Selected classes");
 
-        List<ClassRecord> classes = new ArrayList<>(t.selectedClasses);
-        classes.sort(Comparator
-                .comparing((ClassRecord c) -> c.topicCode)
-                .thenComparing(c -> c.classType)
-                .thenComparingInt(c -> c.instanceNumber));
+        List<ClassRecord> classes = sortedClassesCopy(t.selectedClasses);
 
         for (ClassRecord cr : classes) {
             Config.divider();
@@ -857,11 +854,7 @@ public class TimetableMode {
     }
 
     private Path writeTimetableDelimited(GeneratedTimetable timetable, Path path, String delimiter) throws IOException {
-        List<ClassRecord> classes = new ArrayList<>(timetable.selectedClasses);
-        classes.sort(Comparator
-                .comparing((ClassRecord c) -> c.topicCode)
-                .thenComparing(c -> c.classType)
-                .thenComparingInt(c -> c.instanceNumber));
+        List<ClassRecord> classes = sortedClassesCopy(timetable.selectedClasses);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             writer.write(String.join(delimiter, EXPORT_COLUMNS));
@@ -890,11 +883,7 @@ public class TimetableMode {
     }
 
     private Path writeTimetableJson(GeneratedTimetable timetable, Path path) throws IOException {
-        List<ClassRecord> classes = new ArrayList<>(timetable.selectedClasses);
-        classes.sort(Comparator
-                .comparing((ClassRecord c) -> c.topicCode)
-                .thenComparing(c -> c.classType)
-                .thenComparingInt(c -> c.instanceNumber));
+        List<ClassRecord> classes = sortedClassesCopy(timetable.selectedClasses);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             writer.write("[");
@@ -1073,6 +1062,12 @@ public class TimetableMode {
             if (weekday.equalsIgnoreCase(d)) return weekday;
         }
         return null;
+    }
+
+    private static List<ClassRecord> sortedClassesCopy(List<ClassRecord> source) {
+        List<ClassRecord> copy = new ArrayList<>(source);
+        copy.sort(CLASS_SORT_ORDER);
+        return copy;
     }
 
     private static final String[] WEEKDAYS =
