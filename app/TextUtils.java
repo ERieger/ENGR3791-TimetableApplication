@@ -1,4 +1,4 @@
-public final class TextUtils {
+final class TextUtils {
     private TextUtils() {}
 
     static String nullIfBlank(String value) {
