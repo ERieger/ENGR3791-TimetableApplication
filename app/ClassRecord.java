@@ -56,26 +56,26 @@ public class ClassRecord {
     }
 
     boolean matchesSearch(SearchCriteria c) {
-        if (c.topicCode      != null && !topicCode.toLowerCase().contains(c.topicCode.toLowerCase()))           return false;
-        if (c.topicName      != null && !topicName.toLowerCase().contains(c.topicName.toLowerCase()))           return false;
-        if (c.mode           != null && !mode.toLowerCase().contains(c.mode.toLowerCase()))                     return false;
-        if (c.campus         != null && !campus.toLowerCase().contains(c.campus.toLowerCase()))                 return false;
+        if (c.topicCode      != null && !TextUtils.containsIgnoreCase(topicCode, c.topicCode))                  return false;
+        if (c.topicName      != null && !TextUtils.containsIgnoreCase(topicName, c.topicName))                  return false;
+        if (c.mode           != null && !TextUtils.containsIgnoreCase(mode, c.mode))                            return false;
+        if (c.campus         != null && !TextUtils.containsIgnoreCase(campus, c.campus))                        return false;
         if (c.semester       != null && !semester.equalsIgnoreCase(c.semester))                                 return false;
         if (c.offeringGroup  > 0     && offeringGroup != c.offeringGroup)                                       return false;
-        if (c.classType      != null && !classType.toLowerCase().contains(c.classType.toLowerCase()))           return false;
+        if (c.classType      != null && !TextUtils.containsIgnoreCase(classType, c.classType))                  return false;
         if (c.instanceNumber > 0     && instanceNumber != c.instanceNumber)                                     return false;
         if (c.hasSessionFilters()) return sessions.stream().anyMatch(s -> sessionMatches(s, c));
         return true;
     }
 
     private boolean sessionMatches(SessionRecord s, SearchCriteria c) {
-        if (c.firstDate != null && !s.dateStart.toLowerCase().contains(c.firstDate.toLowerCase()))  return false;
-        if (c.lastDate  != null && !s.dateEnd.toLowerCase().contains(c.lastDate.toLowerCase()))     return false;
-        if (c.day       != null && !s.day.toLowerCase().contains(c.day.toLowerCase()))              return false;
+        if (c.firstDate != null && !TextUtils.containsIgnoreCase(s.dateStart, c.firstDate))         return false;
+        if (c.lastDate  != null && !TextUtils.containsIgnoreCase(s.dateEnd, c.lastDate))            return false;
+        if (c.day       != null && !TextUtils.containsIgnoreCase(s.day, c.day))                     return false;
         if (c.timeStart != null && !s.timeStart.equals(c.timeStart))                                return false;
         if (c.timeEnd   != null && !s.timeEnd.equals(c.timeEnd))                                    return false;
-        if (c.building  != null && !s.building.toLowerCase().contains(c.building.toLowerCase()))    return false;
-        if (c.room      != null && !s.room.toLowerCase().contains(c.room.toLowerCase()))            return false;
+        if (c.building  != null && !TextUtils.containsIgnoreCase(s.building, c.building))           return false;
+        if (c.room      != null && !TextUtils.containsIgnoreCase(s.room, c.room))                   return false;
         return true;
     }
 }

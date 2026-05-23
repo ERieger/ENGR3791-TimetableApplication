@@ -126,46 +126,46 @@ public class CsvToSqliteLoader {
         if (rows.size() < 2) return 0;
 
         String[] header = rows.get(0);
-        int iTopic    = findCol(header, "Topic");
-        int iAvail    = findCol(header, "Availability");
-        int iClass    = findCol(header, "Class");
-        int iInstance = findCol(header, "Class instance");
-        int iDate     = findCol(header, "Date");
-        int iDay      = findCol(header, "Day");
-        int iTime     = findCol(header, "Time");
-        int iLocation = findColAny(header, "Location", "Room");
+        int iTopic    = CsvParsingUtils.findCol(header, "Topic");
+        int iAvail    = CsvParsingUtils.findCol(header, "Availability");
+        int iClass    = CsvParsingUtils.findCol(header, "Class");
+        int iInstance = CsvParsingUtils.findCol(header, "Class instance");
+        int iDate     = CsvParsingUtils.findCol(header, "Date");
+        int iDay      = CsvParsingUtils.findCol(header, "Day");
+        int iTime     = CsvParsingUtils.findCol(header, "Time");
+        int iLocation = CsvParsingUtils.findColAny(header, "Location", "Room");
 
         int loaded = 0;
         for (int i = 1; i < rows.size(); i++) {
             String[] row = rows.get(i);
             if (row.length == 0 || (row.length == 1 && row[0].isBlank())) continue;
 
-            String topicFull  = cell(row, iTopic);
-            String avail      = cell(row, iAvail);
-            String classType  = cell(row, iClass);
-            int instanceNum   = parseInt(cell(row, iInstance), csvFile, i);
-            String dateRange  = cell(row, iDate);
-            String dayFull    = cell(row, iDay);
-            String timeRange  = cell(row, iTime);
-            String location   = cell(row, iLocation);
+            String topicFull  = CsvParsingUtils.cell(row, iTopic);
+            String avail      = CsvParsingUtils.cell(row, iAvail);
+            String classType  = CsvParsingUtils.cell(row, iClass);
+            int instanceNum   = CsvParsingUtils.parseInt(CsvParsingUtils.cell(row, iInstance), csvFile, i);
+            String dateRange  = CsvParsingUtils.cell(row, iDate);
+            String dayFull    = CsvParsingUtils.cell(row, iDay);
+            String timeRange  = CsvParsingUtils.cell(row, iTime);
+            String location   = CsvParsingUtils.cell(row, iLocation);
 
             String topicCode  = topicFull.split("\\s+")[0];
 
-            String[] availParts = parseAvailability(avail);
+            String[] availParts = CsvParsingUtils.parseAvailability(avail);
             String mode         = availParts[0];
             String campusName   = availParts[1];
             String semester     = availParts[2];
-            int offeringGroup   = parseInt(availParts[3], csvFile, i);
+            int offeringGroup   = CsvParsingUtils.parseInt(availParts[3], csvFile, i);
 
-            String[] dayParts   = parseDay(dayFull);
+            String[] dayParts   = CsvParsingUtils.parseDay(dayFull);
             String day          = dayParts[0];
             String dayModifier  = dayParts[1]; // may be null
 
-            String[] timeParts  = parseTime(timeRange);
+            String[] timeParts  = CsvParsingUtils.parseTime(timeRange);
             String timeStart    = timeParts[0];
             String timeEnd      = timeParts[1];
 
-            String[] dateParts  = parseDateRange(dateRange);
+            String[] dateParts  = CsvParsingUtils.parseDateRange(dateRange);
             String dateStart    = dateParts[0];
             String dateEnd      = dateParts[1];
 
@@ -345,61 +345,9 @@ public class CsvToSqliteLoader {
                     if (line.startsWith("﻿")) line = line.substring(1); // strip UTF-8 BOM
                     first = false;
                 }
-                if (!line.isBlank()) result.add(splitCsvLine(line));
+                if (!line.isBlank()) result.add(CsvParsingUtils.splitCsvLine(line));
             }
         }
         return result;
-    }
-
-    private static String[] splitCsvLine(String line) {
-        List<String> fields = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        boolean inQuotes = false;
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            if (c == '"') {
-                inQuotes = !inQuotes;
-            } else if (c == ',' && !inQuotes) {
-                fields.add(sb.toString());
-                sb.setLength(0);
-            } else {
-                sb.append(c);
-            }
-        }
-        fields.add(sb.toString());
-        return fields.toArray(new String[0]);
-    }
-
-    // -------------------------------------------------------------------------
-    // Misc utilities
-    // -------------------------------------------------------------------------
-
-    private static String cell(String[] row, int col) {
-        return col < row.length ? row[col].trim() : "";
-    }
-
-    private static int findCol(String[] header, String name) {
-        for (int i = 0; i < header.length; i++) {
-            if (header[i].trim().equalsIgnoreCase(name)) return i;
-        }
-        throw new IllegalArgumentException("Column not found: " + name);
-    }
-
-    private static int findColAny(String[] header, String... candidates) {
-        for (String name : candidates) {
-            for (int i = 0; i < header.length; i++) {
-                if (header[i].trim().equalsIgnoreCase(name)) return i;
-            }
-        }
-        throw new IllegalArgumentException("None of these columns found: " + Arrays.toString(candidates));
-    }
-
-    private static int parseInt(String s, Path file, int rowIndex) {
-        try {
-            return Integer.parseInt(s.trim());
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    String.format("Expected integer at row %d of %s, got: '%s'", rowIndex, file.getFileName(), s));
-        }
     }
 }

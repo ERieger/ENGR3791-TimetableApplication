@@ -170,23 +170,23 @@ public class ClassesView {
         Config.blankLine();
 
         SearchCriteria c = new SearchCriteria();
-        c.topicCode      = nullIfBlank(Config.prompt(sc, "Topic code        (e.g. COMP1002)"));
-        c.topicName      = nullIfBlank(Config.prompt(sc, "Topic name        (partial match)"));
-        c.mode           = nullIfBlank(Config.prompt(sc, "Attendance mode   (e.g. In person)"));
-        c.campus         = nullIfBlank(Config.prompt(sc, "Campus            (e.g. Bedford Park)"));
-        c.semester       = nullIfBlank(Config.prompt(sc, "Semester          (S1 / S2)"));
+        c.topicCode      = TextUtils.nullIfBlank(Config.prompt(sc, "Topic code        (e.g. COMP1002)"));
+        c.topicName      = TextUtils.nullIfBlank(Config.prompt(sc, "Topic name        (partial match)"));
+        c.mode           = TextUtils.nullIfBlank(Config.prompt(sc, "Attendance mode   (e.g. In person)"));
+        c.campus         = TextUtils.nullIfBlank(Config.prompt(sc, "Campus            (e.g. Bedford Park)"));
+        c.semester       = TextUtils.nullIfBlank(Config.prompt(sc, "Semester          (S1 / S2)"));
         String ag        =             Config.prompt(sc, "Availability no.  (e.g. 1)");
-        c.offeringGroup  = ag.isBlank() ? 0 : tryInt(ag);
-        c.classType      = nullIfBlank(Config.prompt(sc, "Class type        (e.g. Lecture)"));
+        c.offeringGroup  = ag.isBlank() ? 0 : TextUtils.parseIntOrZero(ag);
+        c.classType      = TextUtils.nullIfBlank(Config.prompt(sc, "Class type        (e.g. Lecture)"));
         String in        =             Config.prompt(sc, "Instance number   (e.g. 2)");
-        c.instanceNumber = in.isBlank() ? 0 : tryInt(in);
-        c.firstDate      = nullIfBlank(Config.prompt(sc, "Date of first class (e.g. 03 Mar)"));
-        c.lastDate       = nullIfBlank(Config.prompt(sc, "Date of last class  (e.g. 10 Jun)"));
-        c.day            = nullIfBlank(Config.prompt(sc, "Day               (e.g. Monday)"));
-        c.timeStart      = nullIfBlank(Config.prompt(sc, "Start time        (e.g. 09:00)"));
-        c.timeEnd        = nullIfBlank(Config.prompt(sc, "End time          (e.g. 11:00)"));
-        c.building       = nullIfBlank(Config.prompt(sc, "Building          (partial match)"));
-        c.room           = nullIfBlank(Config.prompt(sc, "Room              (partial match)"));
+        c.instanceNumber = in.isBlank() ? 0 : TextUtils.parseIntOrZero(in);
+        c.firstDate      = TextUtils.nullIfBlank(Config.prompt(sc, "Date of first class (e.g. 03 Mar)"));
+        c.lastDate       = TextUtils.nullIfBlank(Config.prompt(sc, "Date of last class  (e.g. 10 Jun)"));
+        c.day            = TextUtils.nullIfBlank(Config.prompt(sc, "Day               (e.g. Monday)"));
+        c.timeStart      = TextUtils.nullIfBlank(Config.prompt(sc, "Start time        (e.g. 09:00)"));
+        c.timeEnd        = TextUtils.nullIfBlank(Config.prompt(sc, "End time          (e.g. 11:00)"));
+        c.building       = TextUtils.nullIfBlank(Config.prompt(sc, "Building          (partial match)"));
+        c.room           = TextUtils.nullIfBlank(Config.prompt(sc, "Room              (partial match)"));
 
         List<ClassRecord> result = db.loadAllClasses().stream()
                 .filter(cr -> cr.matchesSearch(c))
@@ -354,7 +354,7 @@ public class ClassesView {
                 int affected = db.countClassesForOffering(cr.offeringId);
                 newVal = Config.prompt(sc, "New availability no. (current: " + cr.offeringGroup + ")");
                 if (newVal.isBlank()) { Config.warn("No change."); return; }
-                int newInt = tryInt(newVal);
+                int newInt = TextUtils.parseIntOrZero(newVal);
                 if (newInt <= 0) { Config.error("Must be a positive integer."); return; }
                 if (!confirmEdit("availability no.", String.valueOf(cr.offeringGroup),
                                  String.valueOf(newInt), affected, "offering")) return;
@@ -377,7 +377,7 @@ public class ClassesView {
             case 8 -> {
                 newVal = Config.prompt(sc, "New instance no. (current: " + cr.instanceNumber + ")");
                 if (newVal.isBlank()) { Config.warn("No change."); return; }
-                int newInt = tryInt(newVal);
+                int newInt = TextUtils.parseIntOrZero(newVal);
                 if (newInt <= 0) { Config.error("Must be a positive integer."); return; }
                 if (!confirmEdit("instance no.", String.valueOf(cr.instanceNumber),
                                  String.valueOf(newInt), 1, "class")) return;
@@ -541,10 +541,4 @@ public class ClassesView {
         System.out.println("  " + Config.b(Config.pad(label, 20)) + "  " + (value != null ? value : Config.dim("—")));
     }
 
-    private static String nullIfBlank(String s) { return (s == null || s.isBlank()) ? null : s; }
-
-    private static int tryInt(String s) {
-        try { return Integer.parseInt(s.trim()); }
-        catch (NumberFormatException e) { return 0; }
-    }
 }

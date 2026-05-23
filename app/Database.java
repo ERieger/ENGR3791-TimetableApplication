@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class Database {
     private final Connection conn;
@@ -148,17 +149,10 @@ public class Database {
 
     /** Deletes a class instance and all its sessions. */
     void deleteClassInstance(int classInstanceId) throws SQLException {
-        conn.setAutoCommit(false);
-        try {
+        runInTransaction(() -> {
             exec("DELETE FROM class_sessions WHERE class_instance_id = ?", classInstanceId);
             exec("DELETE FROM class_instances WHERE class_instance_id = ?", classInstanceId);
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
+        });
     }
 
     // -------------------------------------------------------------------------
@@ -231,49 +225,14 @@ public class Database {
 
     /** Updates building+room across ALL sessions (rebuilds location string). */
     void updateAllSessionBuilding(int classInstanceId, String newBuilding) throws SQLException {
-        // Preserve existing room portion of each session's location
-        List<SessionRecord> sessions = loadSessions(classInstanceId);
-        conn.setAutoCommit(false);
-        try {
-            for (SessionRecord s : sessions) {
-                String newLocation = s.room.isBlank() ? newBuilding : newBuilding + ", " + s.room;
-                try (PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE class_sessions SET location = ? WHERE session_id = ?")) {
-                    ps.setString(1, newLocation);
-                    ps.setInt(2, s.sessionId);
-                    ps.executeUpdate();
-                }
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
+        updateAllSessionLocations(classInstanceId,
+                s -> s.room.isBlank() ? newBuilding : newBuilding + ", " + s.room);
     }
 
     /** Updates room across ALL sessions (preserves existing building portion). */
     void updateAllSessionRoom(int classInstanceId, String newRoom) throws SQLException {
-        List<SessionRecord> sessions = loadSessions(classInstanceId);
-        conn.setAutoCommit(false);
-        try {
-            for (SessionRecord s : sessions) {
-                String newLocation = s.building.isBlank() ? newRoom : s.building + ", " + newRoom;
-                try (PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE class_sessions SET location = ? WHERE session_id = ?")) {
-                    ps.setString(1, newLocation);
-                    ps.setInt(2, s.sessionId);
-                    ps.executeUpdate();
-                }
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
+        updateAllSessionLocations(classInstanceId,
+                s -> s.building.isBlank() ? newRoom : s.building + ", " + newRoom);
     }
 
     /**
@@ -401,5 +360,35 @@ public class Database {
             }
             ps.executeUpdate();
         }
+    }
+
+    private void updateAllSessionLocations(int classInstanceId,
+                                           Function<SessionRecord, String> locationBuilder) throws SQLException {
+        List<SessionRecord> sessions = loadSessions(classInstanceId);
+        runInTransaction(() -> {
+            for (SessionRecord session : sessions) {
+                exec("UPDATE class_sessions SET location = ? WHERE session_id = ?",
+                        locationBuilder.apply(session), session.sessionId);
+            }
+        });
+    }
+
+    private void runInTransaction(SqlAction action) throws SQLException {
+        boolean previousAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        try {
+            action.run();
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(previousAutoCommit);
+        }
+    }
+
+    @FunctionalInterface
+    private interface SqlAction {
+        void run() throws SQLException;
     }
 }

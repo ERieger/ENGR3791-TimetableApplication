@@ -16,7 +16,7 @@ CP=".:$(echo lib/*.jar | tr ' ' ':')"
 
 # Compile
 echo "Compiling..."
-javac -cp "$CP" CsvToSqliteLoader.java
+javac -cp "$CP" ./*.java
 
 # Run
 echo "Running loader..."
