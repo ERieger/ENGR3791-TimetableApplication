@@ -21,7 +21,8 @@ CP=".:$(echo lib/*.jar | tr ' ' ':')"
 
 echo "Compiling..."
 javac -cp "$CP" Config.java SessionRecord.java ClassRecord.java SearchCriteria.java \
-      Database.java ClassesView.java TimetableMode.java TimetableApp.java
+      Database.java ClassesView.java TimetableGenerationEngine.java TimetableExportEngine.java \
+      TimetableMode.java TimetableApp.java
 
 echo "Starting application..."
 java -cp "$CP" TimetableApp "$@"
