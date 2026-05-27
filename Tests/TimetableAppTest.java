@@ -35,6 +35,11 @@ class TimetableAppTest {
         assertTrue(output.contains("main menu"));
         assertTrue(output.contains("import mode"));
         assertTrue(output.contains("to import csv data, run the data loader from the command line:"));
+        assertInOrder(output,
+                "main menu",
+                "enter option:",
+                "import mode",
+                "to import csv data, run the data loader from the command line:");
     }
 
     @Test
@@ -44,6 +49,7 @@ class TimetableAppTest {
         assertTrue(output.contains("unknown option"));
         assertTrue(output.contains("import mode"));
         assertTrue(output.contains("to import csv data, run the data loader from the command line:"));
+        assertInOrder(output, "unknown option", "import mode");
     }
 
     private String runMainWithInput(String input) throws Exception {
@@ -56,11 +62,27 @@ class TimetableAppTest {
 
             TimetableApp.main(new String[]{tempDb.toString()});
         } finally {
-            Files.deleteIfExists(tempDb);
+            boolean deleted = Files.deleteIfExists(tempDb);
+            assertTrue(deleted || !Files.exists(tempDb), "Temporary test DB file was not cleaned up");
         }
 
         String raw = out.toString(StandardCharsets.UTF_8);
         String noAnsi = raw.replaceAll("\\u001B\\[[;\\d]*m", "");
         return noAnsi.toLowerCase(Locale.ROOT);
+    }
+
+    private void assertInOrder(String text, String first, String second) {
+        int firstIndex = text.indexOf(first);
+        int secondIndex = text.indexOf(second);
+        assertTrue(firstIndex >= 0, "Missing text: " + first);
+        assertTrue(secondIndex >= 0, "Missing text: " + second);
+        assertTrue(firstIndex < secondIndex,
+                "Expected '" + first + "' to appear before '" + second + "'");
+    }
+
+    private void assertInOrder(String text, String first, String second, String third, String fourth) {
+        assertInOrder(text, first, second);
+        assertInOrder(text, second, third);
+        assertInOrder(text, third, fourth);
     }
 }
