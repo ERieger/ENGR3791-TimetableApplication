@@ -1,0 +1,5 @@
+*.class
+timetable.db
+timetable.db-wal
+timetable.db-shm
+lib/*.jar
