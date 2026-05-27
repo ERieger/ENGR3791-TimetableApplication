@@ -17,4 +17,8 @@ class TimetableAppTest {
     @Test
     void main() {
     }
+
+    @Test
+    void importMode() {
+    }
 }
