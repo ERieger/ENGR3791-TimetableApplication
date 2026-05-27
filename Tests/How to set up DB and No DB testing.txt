@@ -1,0 +1,25 @@
+Database connection BeforeAll to load the database:
+    @BeforeAll
+    static void setUpDb() throws Exception {
+
+        Path dbPath = Paths.get("data-loader", "timetable.db");
+
+        Files.deleteIfExists(dbPath);
+        Files.deleteIfExists(Paths.get("data-loader", "timetable.db-shm"));
+        Files.deleteIfExists(Paths.get("data-loader", "timetable.db-wal"));
+
+        CsvToSqliteLoader.main(new String[]{
+                "./Spec and CSVs/CSV",
+                dbPath.toString()
+        });
+
+        System.out.println("Database setup complete at: " + dbPath.toAbsolutePath());
+    }
+
+Then when you call TimetableApp.main{} in your test do it like this!
+
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+If you want a test to not use the database i.e. for no data loaded tests call the app like this:
+
+        TimetableApp.main(new String[]{":memory:"});

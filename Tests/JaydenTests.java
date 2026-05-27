@@ -7,11 +7,12 @@ Import Mode
 
 Search Mode
 4.04	No Matches shows 'No classes found' ✅
-4.05	Campus and Semester filters work
-4.06	Invalid input does not crash the app
+4.05	Semester filters work✅
+4.06	Campus filters work ✅
+4.07	Invalid input does not crash the app ✅
 
 Timetable Mode
-5.01	Generating Timetable with no Class data Warning
+5.01	Generating Timetable with no Class data Warning ✅
 */
 
 

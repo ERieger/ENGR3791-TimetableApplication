@@ -25,8 +25,8 @@ class TimetableAppTest {
     }
 
     @Tag("Jayden")
-    @Tag("Core")
-    @DisplayName("Testing Import Mode displays required Information")
+    @Tag("Critical")
+    @DisplayName("3.01 Shows the loader command with defaults")
     @Test
     void importModeExpectedOutput() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -44,15 +44,38 @@ class TimetableAppTest {
         assertAll(
                 () -> assertTrue(output.contains("IMPORT MODE")),
                 () -> assertTrue(output.contains("To import CSV data, run the data loader from the command line:")),
-                () -> assertTrue(output.contains("cd ../data-loader && ./load.sh [csv-dir] [db-file]")),
-                () -> assertTrue(output.contains("Default CSV directory : ../Spec and CSVs/CSV")),
-                () -> assertTrue(output.contains("Default database file : test.db"))
+                () -> assertTrue(output.contains("cd ../data-loader && ./load.sh [csv-dir] [db-file]"))
         );
     }
 
     @Tag("Jayden")
     @Tag("Core")
-    @DisplayName("Testing getting to Import Mode")
+    @DisplayName("3.02 Shows the loader command with defaults")
+    @Test
+    void importModePathArgument() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(out));
+
+        try {
+            TimetableApp.importMode("test.db");
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String output = out.toString();
+
+        assertAll(
+                () -> assertTrue(output.contains("Default CSV directory : ../Spec and CSVs/CSV")),
+                () -> assertTrue(output.contains("Default database file : test.db"))
+        );
+    }
+
+
+
+    @Tag("Jayden")
+    @Tag("Critical")
+    @DisplayName("3.03 Display Import Mode view")
     @Test
     void importModeGettingTo() throws Exception {
         String input = "1" + System.lineSeparator() + "0" + System.lineSeparator();
