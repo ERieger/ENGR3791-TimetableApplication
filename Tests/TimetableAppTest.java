@@ -1,4 +1,6 @@
 import org.junit.jupiter.api.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -28,7 +30,7 @@ class TimetableAppTest {
 
     @Tag("Jayden")
     @Tag("Core")
-    @DisplayName("Testing Import Mode displays")
+    @DisplayName("Testing Import Mode display")
     @Test
     void importModeExpectedOutput() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -53,24 +55,15 @@ class TimetableAppTest {
     }
     @Tag("Jayden")
     @Tag("Core")
-    @DisplayName("Testing Import Mode displays")
+    @DisplayName("Testing getting to Import Mode")
     @Test
-    void importModeGettingTo() {
-        String input = "1"
-                ;
+    void importModeGettingTo() throws Exception {
+        String input = "1" + System.lineSeparator() + "0" + System.lineSeparator();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-        TimetableApp.importMode("test.db");
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+        TimetableApp.main(new String[]{":memory:"});
+        assertEquals(" ",captureOutputStream.toString());
 
-
-        String output = out.toString();
-
-        assertAll(
-                () -> assertTrue(output.contains("IMPORT MODE")),
-                () -> assertTrue(output.contains("To import CSV data, run the data loader from the command line:")),
-                () -> assertTrue(output.contains("cd ../data-loader && ./load.sh [csv-dir] [db-file]")),
-                () -> assertTrue(output.contains("Default CSV directory : ../Spec and CSVs/CSV")),
-                () -> assertTrue(output.contains("Default database file : test.db"))
-        );
     }
 }
