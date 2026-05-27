@@ -63,7 +63,7 @@ public class TimetableApp {
         Config.blankLine();
     }
 
-    private static void importMode(String dbPath) {
+    static void importMode(String dbPath) {
         Config.header("IMPORT MODE");
         Config.println("To import CSV data, run the data loader from the command line:");
         Config.blankLine();
