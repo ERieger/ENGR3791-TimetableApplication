@@ -24,13 +24,9 @@ class TimetableAppTest {
         System.setOut(originalOutputStream);
     }
 
-    @Test
-    void main() {
-    }
-
     @Tag("Jayden")
     @Tag("Core")
-    @DisplayName("Testing Import Mode display")
+    @DisplayName("Testing Import Mode displays required Information")
     @Test
     void importModeExpectedOutput() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -53,6 +49,7 @@ class TimetableAppTest {
                 () -> assertTrue(output.contains("Default database file : test.db"))
         );
     }
+
     @Tag("Jayden")
     @Tag("Core")
     @DisplayName("Testing getting to Import Mode")
@@ -63,7 +60,9 @@ class TimetableAppTest {
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
         TimetableApp.main(new String[]{":memory:"});
-        assertEquals(" ",captureOutputStream.toString());
-
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("MAIN MENU")),
+                () -> assertTrue(captureOutputStream.toString().contains("IMPORT MODE"))
+        );
     }
 }
