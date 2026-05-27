@@ -44,6 +44,38 @@ class TimetableModeTest {
         System.setOut(originalOutputStream);
     }
 
+    @DisplayName("1.09 Timetable Mode Input (Correct)")
+    @Tag("Aidan")
+    @Tag("Critical")
+    @Test
+    void timetableModeInput() throws Exception {
+
+    }
+
+    @DisplayName("1.10 Timetable Mode Input (Incorrect)")
+    @Tag("Aidan")
+    @Tag("Core")
+    @Test
+    void timetableModeIncorrect() throws Exception {
+
+    }
+
+    @DisplayName("1.11 Timetable Mode Input (MAX and MIN Ints)")
+    @Tag("Aidan")
+    @Tag("Core")
+    @Test
+    void timetableModeInputMaxAndMinInts() throws Exception {
+
+    }
+
+    @DisplayName("1.12 Timetable Mode Input (Passing Nulls)")
+    @Tag("Aidan")
+    @Tag("Additional")
+    @Test
+    void timetableModeInputPassingNulls() throws Exception {
+
+    }
+
     @DisplayName(" 5.01 Generating Timetable with no Class data Warning")
     @Tag("Jayden")
     @Tag("Additional")
@@ -58,4 +90,75 @@ class TimetableModeTest {
                 () -> assertTrue(captureOutputStream.toString().contains("No class data found. Import data first."))
         );
     }
+
+    @DisplayName("5.02 Special Characters in Timetable name")
+    @Tag("Numa")
+    @Tag("Additional")
+    @Test
+    void timetableModeInputSpecialCharacters() throws Exception {
+    }
+
+    @DisplayName("5.03 Delete mode cancels correctly after prompt")
+    @Tag("Elijah")
+    @Tag("Critical")
+    @Test
+    void deleteModeCancel() throws Exception {}
+
+    @DisplayName("5.04 Delete mode deletes correctly after prompt")
+    @Tag("Elijah")
+    @Tag("Critical")
+    @Test
+    void deleteModeDelete() {
+    }
+
+    @DisplayName("5.05 Export Incorrect File Path")
+    @Tag("Elijah")
+    @Tag("Core")
+    @Test
+    void exportIncorrectFile() throws Exception {}
+
+    @DisplayName("5.06 Export Null File Path")
+    @Tag("Elijah")
+    @Tag("Additional")
+    @Test
+    void exportNullFile() throws Exception {}
+
+    @DisplayName("5.07 Export Possible File Path")
+    @Tag("Elijah")
+    @Tag("Core")
+    @Test
+    void exportPossibleFile() throws Exception {}
+
+    @DisplayName("5.08 Exporting in TSV")
+    @Tag("Numa")
+    @Tag("Additional")
+    @Test
+    void exportTSV() throws Exception {}
+
+    @DisplayName("5.09 Exporting in JSON")
+    @Tag("Elijah")
+    @Tag("Additional")
+    @Test
+    void exportJSON() throws Exception {}
+
+    @DisplayName("5.10 Exporting in CSV")
+    @Tag("Elijah")
+    @Tag("Core")
+    @Test
+    void exportCSV() throws Exception {}
+
+    @DisplayName("5.11 Generating Timetable error/help messages")
+    @Tag("Aidan")
+    @Tag("Core")
+    @Test
+    void generatingModeErrors() throws Exception {
+    }
+
+
+
+
+
+
+
+
 }

@@ -24,6 +24,48 @@ class TimetableAppTest {
         System.setOut(originalOutputStream);
     }
 
+
+
+    @Tag("Lucy")
+    @Tag("Critical")
+    @DisplayName("1.01 Main Menu Inputs (Correct)")
+    @Test
+    void mainMenuInputsCorrect() {
+
+    }
+
+    @Tag("Lucy")
+    @Tag("Core")
+    @DisplayName("1.02 Main Menu Inputs (Incorrect)")
+    @Test
+    void mainMenuInputsIncorrect() {
+
+    }
+
+    @Tag("Numa")
+    @Tag("Core")
+    @DisplayName("1.03 Main Menu Inputs (MAX and MIN Ints)")
+    @Test
+    void mainMenuInputsMaxAndMinInts() {
+
+    }
+
+    @Tag("Numa")
+    @Tag("Additional")
+    @DisplayName("1.04 Main Menu Inputs (Passing Nulls)")
+    @Test
+    void mainMenuInputsPassingNulls() {
+
+    }
+
+    @Tag("Lucy")
+    @Tag("Critical")
+    @DisplayName("1.13 Exit Option 0")
+    @Test
+    void exitOption0() {
+
+    }
+
     @Tag("Jayden")
     @Tag("Critical")
     @DisplayName("3.01 Shows the loader command with defaults")
@@ -62,16 +104,12 @@ class TimetableAppTest {
         } finally {
             System.setOut(originalOut);
         }
-
         String output = out.toString();
-
         assertAll(
                 () -> assertTrue(output.contains("Default CSV directory : ../Spec and CSVs/CSV")),
                 () -> assertTrue(output.contains("Default database file : test.db"))
         );
     }
-
-
 
     @Tag("Jayden")
     @Tag("Critical")
@@ -79,7 +117,6 @@ class TimetableAppTest {
     @Test
     void importModeGettingTo() throws Exception {
         String input = "1" + System.lineSeparator() + "0" + System.lineSeparator();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
         TimetableApp.main(new String[]{":memory:"});
@@ -88,4 +125,5 @@ class TimetableAppTest {
                 () -> assertTrue(captureOutputStream.toString().contains("IMPORT MODE"))
         );
     }
+
 }

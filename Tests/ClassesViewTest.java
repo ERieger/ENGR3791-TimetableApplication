@@ -49,6 +49,110 @@ class ClassesViewTest {
     void show() {
     }
 
+    @DisplayName("1.05 Class View Input (Correct)")
+    @Tag("Aidan")
+    @Tag("Critical")
+    @Test
+    void classViewInput() throws Exception {
+
+    }
+
+    @DisplayName("1.06 Class View Input (Incorrect)")
+    @Tag("Aidan")
+    @Tag("Core")
+    @Test
+    void classViewInputIncorrect() throws Exception {
+
+    }
+
+    @DisplayName("1.07 Class View Input (MAX and MIN Ints)")
+    @Tag("Aidan")
+    @Tag("Core")
+    @Test
+    void classViewInputMaxAndMinInts() throws Exception {
+
+    }
+
+    @DisplayName("1.08 Class View Input (Passing Nulls)")
+    @Tag("Aidan")
+    @Tag("Additional")
+    @Test
+    void classViewInputPassingNulls() throws Exception {
+
+    }
+
+    @DisplayName("2.01 Invalid input shows warning")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void invalidInputShowsWarning() throws Exception {
+
+    }
+
+    @DisplayName("2.02 viewing individual classes rejects incorrect inputs")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void individualClassIncorrectValues() throws Exception {
+
+    }
+
+    @DisplayName("2.03 Browse all shows warning with no class data")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void browseAllNoDataWarning() throws Exception {
+
+    }
+
+    @DisplayName("2.04 viewing individual classes shows warning with no class data")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void individualClassViewNoDataWarning() throws Exception {
+
+    }
+
+    @DisplayName("2.05 Edit class shows warning with no class data")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void editClassNoDataWarning() throws Exception {
+
+    }
+
+    @DisplayName("2.06 Delete class shows warning with no class data")
+    @Tag("Lucy")
+    @Tag("Core")
+    @Test
+    void deleteClassNoDataWarning() throws Exception {
+
+    }
+
+    @DisplayName("4.01 Blank criteria shows all classes")
+    @Tag("Numa")
+    @Tag("Core")
+    @Test
+    void blankCriteriaShowsAllClasses() throws Exception {
+
+    }
+
+    @DisplayName("4.02 Exact topic code retrieves only that class")
+    @Tag("Elijah")
+    @Tag("Core")
+    @Test
+    void exactTopicCodeRetrievesOnlyThatClass() throws Exception {
+
+    }
+
+    @DisplayName("4.03 Topic name is case-insensitive")
+    @Tag("Elijah")
+    @Tag("Additional")
+    @Test
+    void topicNameIsCaseInsensitive() throws Exception {
+
+    }
+
     @DisplayName("4.04 No Matches shows 'No classes found'")
     @Tag("Jayden")
     @Tag("Core")
@@ -96,7 +200,6 @@ class ClassesViewTest {
         );
     }
 
-
     @DisplayName("4.07 Invalid input does not crash the app")
     @Tag("Jayden")
     @Tag("Core")
@@ -112,10 +215,4 @@ class ClassesViewTest {
         );
     }
 
-
-
-
-    @Test
-    void printClassDetail() {
-    }
 }
