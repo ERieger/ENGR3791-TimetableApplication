@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 class TimetableGenerationEngine {
     private static final String BEDFORD_PARK_CAMPUS = "Bedford Park";
@@ -103,7 +104,7 @@ class TimetableGenerationEngine {
 
     private List<List<ClassRecord>> expandByClassType(List<ClassRecord> classes) {
         Map<String, List<ClassRecord>> byType = classes.stream()
-                .collect(java.util.stream.Collectors.groupingBy(c -> c.classType, LinkedHashMap::new, java.util.stream.Collectors.toList()));
+                .collect(Collectors.groupingBy(c -> c.classType, LinkedHashMap::new, Collectors.toList()));
 
         List<String> orderedTypes = new ArrayList<>(byType.keySet());
         orderedTypes.sort(String::compareTo);
