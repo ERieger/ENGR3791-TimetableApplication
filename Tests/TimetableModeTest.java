@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -102,26 +103,162 @@ class TimetableModeTest {
     @Tag("Elijah")
     @Tag("Critical")
     @Test
-    void deleteModeCancel() throws Exception {}
+    void deleteModeCancel() throws Exception {
+        String input =  "4\n" +                          // Main menu: Timetable Mode
+                        "1\n" +                          // Generate timetable
+                        "testTimetable1\n" +             // Timetable name
+                        "\n" +                           // Default semester/availability
+                        "COMP1002, COMP1102, COMP1103\n" + // Choose topics
+                        "\n" +                           // All campuses
+                        "yes\n" +                        // Allow lecture overlap
+                        "\n" +                           // Default preferences
+                        "4\n" +                          // Delete mode
+                        "0\n" +                          // Cancel / back
+                        "0\n" +                          // Exit timetable mode
+                        "0\n";                           // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//        System.err.println("---- CAPTURED OUTPUT ----");
+//        System.err.println(output);
+//        System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("Generated timetable")),
+                () -> assertTrue(output.contains("DELETE GENERATED TIMETABLE")),
+                () -> assertTrue(output.contains("Deletion cancelled")),
+                () -> assertTrue(output.contains("Goodbye."))
+        );
+    }
 
     @DisplayName("5.04 Delete mode deletes correctly after prompt")
     @Tag("Elijah")
     @Tag("Critical")
     @Test
-    void deleteModeDelete() {
+    void deleteModeDelete() throws Exception {
+        String input =  "4\n" + // Enter timetable mode
+                        "1\n" + // Create a timetable
+                        "testTimetable1\n" + // Name timetable
+                        "\n" + // Default semester
+                        "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                        "\n" + // Default campus
+                        "yes\n" + // Allow lecture overlap
+                        "\n" + // Default preference order
+                        "4\n" + // Delete mode
+                        "1\n" + // Action delete
+                        "Yes\n" + // Confirm delete
+                        "2\n" + // Validate delete
+                        "0\n" + // Exit timetable mode
+                        "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//        System.err.println("---- CAPTURED OUTPUT ----");
+//        System.err.println(output);
+//        System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("Generated timetable")),
+                () -> assertTrue(output.contains("DELETE GENERATED TIMETABLE")),
+                () -> assertTrue(output.contains("You are about to permanently delete this generated timetable:")),
+                () -> assertTrue(output.contains("Deleted timetable: testTimetable1")),
+                () -> assertTrue(output.contains("No generated timetables in this session yet."))
+        );
     }
 
     @DisplayName("5.05 Export Incorrect File Path")
     @Tag("Elijah")
     @Tag("Core")
     @Test
-    void exportIncorrectFile() throws Exception {}
+    void exportIncorrectFile() throws Exception {
+        Random randGen = new Random();
+        int randInt = randGen.nextInt(100);
+        Path outPath = Path.of("./" + randInt + "/Timetable.csv");
+
+        String input =
+                "4\n" + // Enter timetable mode
+                "1\n" + // Create a timetable
+                "testTimetable1\n" + // Name timetable
+                "\n" + // Default semester
+                "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                "\n" + // Default campus
+                "yes\n" + // Allow lecture overlap
+                "\n" + // Default preference order
+                "5\n" + // Export mode
+                "1\n" + // Select fist (and only) timetable
+                "1\n" + // CSV export
+                "./" + randInt + "/Timetable.csv\n" + // Non-existent file path
+                "0\n" + // Exit timetable mode
+                "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//        System.err.println("---- CAPTURED OUTPUT ----");
+//        System.err.println(output);
+//        System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("Generated timetable")),
+                () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
+                () -> assertTrue(output.contains("Output file path")),
+                () -> assertTrue(output.contains("Exported timetable to:")),
+                () -> assertTrue(output.contains("/" + randInt + "/Timetable.csv")),
+                () -> assertTrue(Files.exists(outPath))
+        );
+
+        Files.deleteIfExists(outPath);
+        Files.deleteIfExists(outPath.getParent());
+    }
 
     @DisplayName("5.06 Export Null File Path")
     @Tag("Elijah")
     @Tag("Additional")
     @Test
-    void exportNullFile() throws Exception {}
+    void exportNullFile() throws Exception {
+        String userHome = System.getProperty("user.home");
+        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.csv");
+
+        String input =  "4\n" + // Enter timetable mode
+                        "1\n" + // Create a timetable
+                        "testTimetable1\n" + // Name timetable
+                        "\n" + // Default semester
+                        "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                        "\n" + // Default campus
+                        "yes\n" + // Allow lecture overlap
+                        "\n" + // Default preference order
+                        "5\n" + // Export mode
+                        "1\n" + // Select fist (and only) timetable
+                        "1\n" + // CSV export
+                        "\n"+ // Null file path
+                        "0\n" + // Exit timetable mode
+                        "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//        System.err.println("---- CAPTURED OUTPUT ----");
+//        System.err.println(output);
+//        System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("Generated timetable")),
+                () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
+                () -> assertTrue(output.contains("Output file path")),
+                () -> assertTrue(output.contains("Exported timetable to:")),
+                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.csv")),
+                () -> assertTrue(Files.exists(outPath))
+        );
+
+        Files.deleteIfExists(outPath);
+        Files.deleteIfExists(outPath.getParent());
+    }
 
     @DisplayName("5.07 Export Possible File Path")
     @Tag("Elijah")
