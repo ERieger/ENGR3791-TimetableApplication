@@ -1,4 +1,6 @@
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -142,15 +144,54 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void exactTopicCodeRetrievesOnlyThatClass() throws Exception {
+        String input = "3\n" +
+                        "COMP1711\n" +
+                        "\n".repeat(14) +
+                        "0\n" +
+                        "0\n";
 
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//        System.err.println("---- CAPTURED OUTPUT ----");
+//        System.err.println(output);
+//        System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("SEARCH RESULTS")),
+                () -> assertTrue(output.contains("COMP1711")),
+                () -> assertFalse(output.contains("COMP1003")),
+                () -> assertTrue(output.contains("Found"))
+        );
     }
 
     @DisplayName("4.03 Topic name is case-insensitive")
     @Tag("Elijah")
     @Tag("Additional")
-    @Test
-    void topicNameIsCaseInsensitive() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings={"comp1711", "CoMp1711", "COmp1711", "ComP1711", "cOMp1711"})
+    void topicNameIsCaseInsensitive(String topic) throws Exception {
+        String input = "3\n" +
+                 topic + "\n" +
+                "\n".repeat(14) +
+                "0\n" +
+                "0\n";
 
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+//                System.err.println("---- CAPTURED OUTPUT ----");
+//                System.err.println(output);
+//                System.err.println("-------------------------");
+
+        assertAll(
+                () -> assertTrue(output.contains("SEARCH RESULTS")),
+                () -> assertTrue(output.contains("COMP1711")),
+                () -> assertFalse(output.contains("COMP1003")),
+                () -> assertTrue(output.contains("Found"))
+        );
     }
 
     @DisplayName("4.04 No Matches shows 'No classes found'")
