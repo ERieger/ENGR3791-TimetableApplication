@@ -97,6 +97,14 @@ class TimetableModeTest {
     @Tag("Additional")
     @Test
     void timetableModeInputSpecialCharacters() throws Exception {
+        String input = "4\n" + "1\n" +"!@#$%^&*()\n" +"\n" + "1\n"+ "\n".repeat(3) + "0\n".repeat(3);
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("GENERATE TIMETABLE")),
+                () -> assertTrue(captureOutputStream.toString().contains("!@#$%^&*()"))
+        );
     }
 
     @DisplayName("5.03 Delete mode cancels correctly after prompt")
@@ -272,7 +280,42 @@ class TimetableModeTest {
     @Tag("Numa")
     @Tag("Additional")
     @Test
-    void exportTSV() throws Exception {}
+    void exportTSV() throws Exception {
+        String userHome = System.getProperty("user.home");
+        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.tsv");
+
+        String input =  "4\n" + // Enter timetable mode
+                "1\n" + // Create a timetable
+                "testTimetable1\n" + // Name timetable
+                "\n" + // Default semester
+                "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                "\n" + // Default campus
+                "yes\n" + // Allow lecture overlap
+                "\n" + // Default preference order
+                "5\n" + // Export mode
+                "1\n" + // Select fist (and only) timetable
+                "2\n" + // TSV export
+                "\n"+ // Null file path
+                "0\n" + // Exit timetable mode
+                "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+
+        assertAll(
+                () -> assertTrue(output.contains("Generated timetable")),
+                () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
+                () -> assertTrue(output.contains("Output file path")),
+                () -> assertTrue(output.contains("Exported timetable to:")),
+                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.tsv")),
+                () -> assertTrue(Files.exists(outPath))
+        );
+
+        Files.deleteIfExists(outPath);
+        Files.deleteIfExists(outPath.getParent());
+    }
 
     @DisplayName("5.09 Exporting in JSON")
     @Tag("Elijah")

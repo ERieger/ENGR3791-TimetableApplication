@@ -7,7 +7,7 @@ import java.util.Scanner;
  */
 public class TimetableApp {
 
-    private static final String DEFAULT_DB = "../data-loader/timetable.db";
+    private static final String DEFAULT_DB = "./data-loader/timetable.db";
 
     public static void main(String[] args) throws Exception {
         String dbPath = args.length > 0 ? args[0] : DEFAULT_DB;

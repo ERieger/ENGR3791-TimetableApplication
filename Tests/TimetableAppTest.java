@@ -1,4 +1,6 @@
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,8 +47,17 @@ class TimetableAppTest {
     @Tag("Numa")
     @Tag("Core")
     @DisplayName("1.03 Main Menu Inputs (MAX and MIN Ints)")
-    @Test
-    void mainMenuInputsMaxAndMinInts() {
+    @ParameterizedTest
+    @ValueSource(strings= {Integer.MAX_VALUE+"", Integer.MIN_VALUE+""})
+    void mainMenuInputsMaxAndMinInts( String intput) throws Exception {
+        String input = intput +
+                "\n" +
+                "0\n";
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+        assertTrue(output.contains("Unknown option – please try again"));
 
     }
 
@@ -54,8 +65,15 @@ class TimetableAppTest {
     @Tag("Additional")
     @DisplayName("1.04 Main Menu Inputs (Passing Nulls)")
     @Test
-    void mainMenuInputsPassingNulls() {
+    void mainMenuInputsPassingNulls() throws Exception {
+        String input = null +
+                "\n" +
+                "0\n";
 
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+        assertTrue(output.contains("Unknown option – please try again"));
     }
 
     @Tag("Lucy")

@@ -136,6 +136,30 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void blankCriteriaShowsAllClasses() throws Exception {
+        String input = "3\n" +
+                "\n".repeat(16) +
+                "0\n";
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        String output = captureOutputStream.toString();
+
+
+        assertAll(
+                () -> assertTrue(output.contains("SEARCH RESULTS")),
+                () -> assertTrue(output.contains("COMP1002")),
+                () -> assertTrue(output.contains("COMP1102")),
+                () -> assertTrue(output.contains("COMP1103")),
+                () -> assertTrue(output.contains("COMP1701")),
+                () -> assertTrue(output.contains("COMP1702")),
+                () -> assertTrue(output.contains("COMP1711")),
+                () -> assertTrue(output.contains("ENGR1401")),
+                () -> assertTrue(output.contains("ENGR1762")),
+                () -> assertTrue(output.contains("ENGR1401")),
+                () -> assertTrue(output.contains("Found"))
+        );
+
+
 
     }
 
