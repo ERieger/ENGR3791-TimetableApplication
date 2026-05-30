@@ -30,16 +30,50 @@ class TimetableAppTest {
     @Tag("Critical")
     @DisplayName("1.01 Main Menu Inputs (Correct)")
     @Test
-    void mainMenuInputsCorrect() {
+    void mainMenuInputsCorrect() throws Exception{
+        String[] inputs = {
+                "0\n",
+                "1\n0\n",
+                "2\n0\n0\n",
+                "3\n" + "\n".repeat(15) + "0\n0\n",   //because "search classes" takes LOADS of inputs!!
+                "4\n0\n0\n"
+        };
 
+        for (String input : inputs) {
+        ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(captureOutputStream));
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        String output = captureOutputStream.toString();
+
+        assertFalse(output.contains("Unknown option – please try again"));
+        }
     }
-
+    
     @Tag("Lucy")
     @Tag("Core")
     @DisplayName("1.02 Main Menu Inputs (Incorrect)")
     @Test
-    void mainMenuInputsIncorrect() {
+    void mainMenuInputsIncorrect() throws Exception{
+        String[] inputs = {
+                "7\n0\n",
+                "30\n0\n",
+                "b\n0\n"
+        };
 
+        for (String input : inputs) {
+            ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(captureOutputStream));
+            System.setIn(new ByteArrayInputStream(input.getBytes()));
+
+            TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+            String output = captureOutputStream.toString();
+
+            assertTrue(output.contains("Unknown option – please try again"));
+        }
     }
 
     @Tag("Numa")
