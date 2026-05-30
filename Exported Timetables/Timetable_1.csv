@@ -1,3 +1,0 @@
-timetable_name,topic_code,topic_name,class_type,instance_number,campus,semester,offering_group,mode,session_day,session_day_modifier,session_time_start,session_time_end,session_location,session_date_start,session_date_end
-"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Workshop","1","Flinders City Campus","S1","1","In person","Tuesday","","11:00","14:00","Festival Tower, 505 Collaborative Learning","03 Mar","07 Apr"
-"Timetable 1","COMP1002","COMP1002 Fundamentals of Artificial Intelligence","Workshop","1","Flinders City Campus","S1","1","In person","Tuesday","","11:00","14:00","Festival Tower, 505 Collaborative Learning","28 Apr","09 Jun"

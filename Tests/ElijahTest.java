@@ -2,7 +2,7 @@
 
 /*
 Search Mode
-4.02	Exact topic code retreives only that class
+4.02	Exact topic code retrieves only that class
 4.03	Topic name is case-insensitive
 
 TimeTable Mode

@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,9 @@ class TimetableModeTest {
     private final InputStream originalInputStream = System.in;
     private final PrintStream originalOutputStream = System.out;
     private final ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
+
+    @TempDir
+    static Path sharedTempDir;
 
     @BeforeAll
     static void setUpDb() throws Exception {
@@ -177,7 +181,7 @@ class TimetableModeTest {
     void exportIncorrectFile() throws Exception {
         Random randGen = new Random();
         int randInt = randGen.nextInt(100);
-        Path outPath = Path.of("./" + randInt + "/Timetable.csv");
+        Path outPath = sharedTempDir.resolve(randInt + "/Timetable.csv");
 
         String input =
                 "4\n" + // Enter timetable mode
@@ -191,7 +195,7 @@ class TimetableModeTest {
                 "5\n" + // Export mode
                 "1\n" + // Select fist (and only) timetable
                 "1\n" + // CSV export
-                "./" + randInt + "/Timetable.csv\n" + // Non-existent file path
+                outPath.toString() + "\n" + // Non-existent file path
                 "0\n" + // Exit timetable mode
                 "0\n"; // Exit app
 
@@ -208,10 +212,9 @@ class TimetableModeTest {
                 () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
                 () -> assertTrue(output.contains("Output file path")),
                 () -> assertTrue(output.contains("Exported timetable to:")),
-                () -> assertTrue(output.contains("/" + randInt + "/Timetable.csv")),
+                () -> assertTrue(output.contains("\\" + randInt + "\\Timetable.csv")),
                 () -> assertTrue(Files.exists(outPath))
         );
-
         Files.deleteIfExists(outPath);
         Files.deleteIfExists(outPath.getParent());
     }
@@ -221,8 +224,8 @@ class TimetableModeTest {
     @Tag("Additional")
     @Test
     void exportNullFile() throws Exception {
-        String userHome = System.getProperty("user.home");
-        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.csv");
+        Path outPath = Path.of("../Exported Timetables", "testTimetable1.csv");
+        ;
 
         String input =  "4\n" + // Enter timetable mode
                         "1\n" + // Create a timetable
@@ -252,10 +255,9 @@ class TimetableModeTest {
                 () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
                 () -> assertTrue(output.contains("Output file path")),
                 () -> assertTrue(output.contains("Exported timetable to:")),
-                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.csv")),
+                () -> assertTrue(output.contains("\\Exported Timetables\\testTimetable1.csv")),
                 () -> assertTrue(Files.exists(outPath))
         );
-
         Files.deleteIfExists(outPath);
         Files.deleteIfExists(outPath.getParent());
     }
@@ -280,7 +282,7 @@ class TimetableModeTest {
     @Test
     void exportJSON() throws Exception  {
         String userHome = System.getProperty("user.home");
-        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.json");
+        Path outPath = Path.of("../Exported Timetables/testTimetable1.json");
 
         String input =  "4\n" + // Enter timetable mode
                 "1\n" + // Create a timetable
@@ -310,7 +312,7 @@ class TimetableModeTest {
                 () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
                 () -> assertTrue(output.contains("Output file path")),
                 () -> assertTrue(output.contains("Exported timetable to:")),
-                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.json")),
+                () -> assertTrue(output.contains("\\Exported Timetables\\testTimetable1.json")),
                 () -> assertTrue(Files.exists(outPath))
         );
 
@@ -324,8 +326,7 @@ class TimetableModeTest {
     @Tag("Core")
     @Test
     void exportCSV() throws Exception  {
-        String userHome = System.getProperty("user.home");
-        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.csv");
+        Path outPath = Path.of("../Exported Timetables/testTimetable1.csv");
 
         String input =  "4\n" + // Enter timetable mode
                 "1\n" + // Create a timetable
@@ -355,7 +356,7 @@ class TimetableModeTest {
                 () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
                 () -> assertTrue(output.contains("Output file path")),
                 () -> assertTrue(output.contains("Exported timetable to:")),
-                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.csv")),
+                () -> assertTrue(output.contains("\\Exported Timetables\\testTimetable1.csv")),
                 () -> assertTrue(Files.exists(outPath))
         );
 
