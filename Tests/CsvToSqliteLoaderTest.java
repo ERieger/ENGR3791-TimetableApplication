@@ -111,4 +111,25 @@ class CsvToSqliteLoaderTest {
         );
     }
 
+    @DisplayName("6.Extra Passing Empty Data")
+    @Tag("Jayden")
+    @Tag("Additional")
+    @Test
+    void passingEmptyData2() throws Exception{
+        Path dbPath = Paths.get("data-loader", "timetable.db");
+        Path tempdir = Files.createTempDirectory("csv-test"); //importing an empty csv file
+        Files.createFile(tempdir.resolve("emptyTest.csv"));
+
+        CsvToSqliteLoader.main(new String[]{
+                tempdir.toString(),
+                dbPath.toString()
+        });
+        String output = captureOutputStream.toString();
+        assertAll(
+                () -> assertTrue(output.contains("Loading")),
+                () -> assertTrue(output.contains("Done. Loaded 1 file(s), 0 data row(s)"))
+        );
+    }
+
+
 }

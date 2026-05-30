@@ -284,7 +284,7 @@ class TimetableModeTest {
     @Test
     void exportTSV() throws Exception {
         String userHome = System.getProperty("user.home");
-        Path outPath = Path.of(userHome + "/Exported Timetables/testTimetable1.tsv");
+        Path outPath = Path.of("../Exported Timetables/testTimetable1.tsv");
 
         String input =  "4\n" + // Enter timetable mode
                 "1\n" + // Create a timetable
@@ -311,7 +311,7 @@ class TimetableModeTest {
                 () -> assertTrue(output.contains("EXPORT GENERATED TIMETABLE")),
                 () -> assertTrue(output.contains("Output file path")),
                 () -> assertTrue(output.contains("Exported timetable to:")),
-                () -> assertTrue(output.contains("/Exported Timetables/testTimetable1.tsv")),
+                () -> assertTrue(output.contains("\\Exported Timetables" + "\\testTimetable1.tsv")),
                 () -> assertTrue(Files.exists(outPath))
         );
 
