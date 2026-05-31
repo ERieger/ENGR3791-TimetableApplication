@@ -114,8 +114,19 @@ class TimetableAppTest {
     @Tag("Critical")
     @DisplayName("1.13 Exit Option 0")
     @Test
-    void exitOption0() {
+    void exitOption0() throws Exception{
+        String input = "0\n";
 
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(captureOutputStream));
+
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        System.setOut(System.out);
+        String output = captureOutputStream.toString();
+
+        assertTrue(output.contains("Goodbye"));
     }
 
     @Tag("Jayden")
