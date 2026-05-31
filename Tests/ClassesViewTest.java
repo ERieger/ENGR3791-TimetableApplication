@@ -88,15 +88,36 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void invalidInputShowsWarning() throws Exception {
+        String input = "10\n" + "0\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
 
+        ClassesView testView = new ClassesView(null, new Scanner(System.in)); //I tried putting in "data-loader/timetable.db" but it was upset with that
+        testView.show();
+
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again"));
     }
+    //could also add in extra tests for edge cases (max/min inputs) if we get time! So its more like the pracs :)
 
     @DisplayName("2.02 viewing individual classes rejects incorrect inputs")
     @Tag("Lucy")
     @Tag("Core")
     @Test
     void individualClassIncorrectValues() throws Exception {
+        String input = "2\n" + "2\n" + "notaclass\n" + "0\n" + "0\n";
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        System.setOut(System.out);
+        String output = outputStream.toString();
+
+        assertTrue(output.contains("Invalid number"));
     }
 
     @DisplayName("2.03 Browse all shows warning with no class data")
@@ -104,7 +125,20 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void browseAllNoDataWarning() throws Exception {
+        String input = "2\n" + "1\n" + "0\n" + "0\n";
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        TimetableApp.main(new String[]{":memory:"});
+
+        System.setOut(System.out);
+        String output = outputStream.toString();
+
+        assertTrue(output.contains("No class data found"));
     }
 
     @DisplayName("2.04 viewing individual classes shows warning with no class data")
@@ -112,15 +146,41 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void individualClassViewNoDataWarning() throws Exception {
+        String input = "2\n" + "2\n" + "0\n" + "0\n";
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        TimetableApp.main(new String[]{":memory:"});
+
+        System.setOut(System.out);
+        String output = outputStream.toString();
+
+        assertTrue(output.contains("No class data found"));
     }
 
     @DisplayName("2.05 Edit class shows warning with no class data")
     @Tag("Lucy")
     @Tag("Core")
     @Test
-    void editClassNoDataWarning() throws Exception {
+    void editClassNoDataWarning() throws Exception  {
+        String input = "2\n" + "3\n" + "0\n" + "0\n";
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        TimetableApp.main(new String[]{":memory:"});
+
+        System.setOut(System.out);
+        String output = outputStream.toString();
+
+        assertTrue(output.contains("No class data found"));
     }
 
     @DisplayName("2.06 Delete class shows warning with no class data")
@@ -128,7 +188,20 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void deleteClassNoDataWarning() throws Exception {
+        String input = "2\n" + "4\n" + "0\n" + "0\n";
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        TimetableApp.main(new String[]{":memory:"});
+
+        System.setOut(System.out);
+        String output = outputStream.toString();
+
+        assertTrue(output.contains("No class data found"));
     }
 
     @DisplayName("4.01 Blank criteria shows all classes")
