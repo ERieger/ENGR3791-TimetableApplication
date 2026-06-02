@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
@@ -52,12 +53,57 @@ class ClassesViewTest {
     void show() {
     }
 
-    @DisplayName("1.05 Class View Input (Correct)")
+    @DisplayName("1.05.01 Class View Input (Correct) Modes 1 to 4")
+    @Tag("Aidan")
+    @Tag("Critical")
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4})
+    void classViewInputN(int mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
+
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of ClassesView obj for testing
+        ClassesView cv = new ClassesView(db, scan);
+        cv.show();
+
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("No class data found. Import data first."));
+    }
+
+    @DisplayName("1.05.01 Class View Input (Correct) Modes 1 to 4")
     @Tag("Aidan")
     @Tag("Critical")
     @Test
-    void classViewInput() throws Exception {
+    void classViewInput0() throws Exception {
+        //Test input
+        String input = 0 + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of ClassesView obj for testing
+        ClassesView cv = new ClassesView(db, scan);
+        cv.show();
+
+        //Tests
+        assertAll(
+                () -> assertFalse(captureOutputStream.toString().contains("No class data found. Import data first.")), //modes 1 to 4
+                () -> assertFalse(captureOutputStream.toString().contains("Unknown option – please try again.")), //incorrect mode
+                () -> assertTrue(captureOutputStream.toString().contains("Enter option:")) //Not unique hence above tests
+        );
     }
 
     @DisplayName("1.06 Class View Input (Incorrect)")
@@ -65,23 +111,73 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void classViewInputIncorrect() throws Exception {
+        //Test input
+        String input = "egg" + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of ClassesView obj for testing
+        ClassesView cv = new ClassesView(db, scan);
+        cv.show();
+
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
     @DisplayName("1.07 Class View Input (MAX and MIN Ints)")
     @Tag("Aidan")
     @Tag("Core")
-    @Test
-    void classViewInputMaxAndMinInts() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {Integer.MIN_VALUE,Integer.MAX_VALUE})
+    void classViewInputMaxAndMinInts(int mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of ClassesView obj for testing
+        ClassesView cv = new ClassesView(db, scan);
+        cv.show();
+
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
-    @DisplayName("1.08 Class View Input (Passing Nulls)")
+    @DisplayName("1.08 Class View Input (Passing Null and Empty)")
     @Tag("Aidan")
     @Tag("Additional")
-    @Test
-    void classViewInputPassingNulls() throws Exception {
+    @ParameterizedTest
+    @NullAndEmptySource
+    void classViewInputPassingNulls(String mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of ClassesView obj for testing
+        ClassesView cv = new ClassesView(db, scan);
+        cv.show();
+
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
     @DisplayName("2.01 Invalid input shows warning")
