@@ -1,5 +1,9 @@
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,11 +54,82 @@ class TimetableModeTest {
         System.setOut(originalOutputStream);
     }
 
-    @DisplayName("1.09 Timetable Mode Input (Correct)")
+    @DisplayName("1.09.01 Timetable Mode Input (Correct) for session specific modes")
+    @Tag("Aidan")
+    @Tag("Critical")
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3, 4, 5})
+    void timetableModeInputN(int mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
+
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertTrue(captureOutputStream.toString().contains("No generated timetables in this session yet."));
+    }
+
+    @DisplayName("1.09.02 Timetable Mode Input (Correct) for Mode 1")
     @Tag("Aidan")
     @Tag("Critical")
     @Test
-    void timetableModeInput() throws Exception {
+    void timetableModeInput1() throws Exception {
+        //Test input
+        String input = 1 + System.lineSeparator() + 0;
+
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertTrue(captureOutputStream.toString().contains("No class data found."));
+    }
+
+    @DisplayName("1.09.03 Timetable Mode Input (Correct) for Mode 0")
+    @Tag("Aidan")
+    @Tag("Critical")
+    @Test
+    void timetableModeInput0() throws Exception {
+        //Test input
+        String input = 0 + System.lineSeparator() + 0;
+
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Enter option:")),//this is NOT unique, hence:
+                () -> assertFalse(captureOutputStream.toString().contains("No generated timetables in this session yet.")),//Modes 2 to 5
+                () -> assertFalse(captureOutputStream.toString().contains("No class data found.")),//Mode 1
+                () -> assertFalse(captureOutputStream.toString().contains("Unknown option – please try again."))//Incorrect modes
+        );
 
     }
 
@@ -62,23 +138,73 @@ class TimetableModeTest {
     @Tag("Core")
     @Test
     void timetableModeIncorrect() throws Exception {
+        //Test input
+        String input = "egg" + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
     @DisplayName("1.11 Timetable Mode Input (MAX and MIN Ints)")
     @Tag("Aidan")
     @Tag("Core")
-    @Test
-    void timetableModeInputMaxAndMinInts() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {Integer.MIN_VALUE, Integer.MAX_VALUE})
+    void timetableModeInputMaxAndMinInts(int mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
-    @DisplayName("1.12 Timetable Mode Input (Passing Nulls)")
+    @DisplayName("1.12 Timetable Mode Input (Passing Null & Empty)")
     @Tag("Aidan")
     @Tag("Additional")
-    @Test
-    void timetableModeInputPassingNulls() throws Exception {
+    @ParameterizedTest
+    @NullAndEmptySource
+    void timetableModeInputPassingNulls(String mode) throws Exception {
+        //Test input
+        String input = mode + System.lineSeparator() + 0;
 
+        //Setup for testing input?
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        //I haven't the faintest idea
+        Scanner scan = new Scanner(captureInputStream);
+        Database db = new Database("timetable.db");
+
+        //Instance of TimetableMode obj for testing
+        TimetableMode ttm = new TimetableMode(db, scan);
+        ttm.show();
+
+        //Test
+        assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."));
     }
 
     @DisplayName(" 5.01 Generating Timetable with no Class data Warning")
