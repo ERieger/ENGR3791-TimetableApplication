@@ -78,7 +78,7 @@ class ClassesViewTest {
         assertTrue(captureOutputStream.toString().contains("No class data found. Import data first."));
     }
 
-    @DisplayName("1.05.01 Class View Input (Correct) Modes 1 to 4")
+    @DisplayName("1.05.02 Class View Input (Correct) Modes 1 to 4")
     @Tag("Aidan")
     @Tag("Critical")
     @Test
