@@ -85,7 +85,7 @@ class TimetableModeTest {
     @Test
     void timetableModeInput1() throws Exception {
         //Test input
-        String input = 1 + System.lineSeparator() + 0;
+        String input = 1 + System.lineSeparator() + 0 + System.lineSeparator() + 0 + System.lineSeparator();
 
         //Setup for testing input?
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
@@ -93,7 +93,7 @@ class TimetableModeTest {
 
         //I haven't the faintest idea
         Scanner scan = new Scanner(captureInputStream);
-        Database db = new Database("timetable.db");
+        Database db = new Database(":memory:");
 
         //Instance of TimetableMode obj for testing
         TimetableMode ttm = new TimetableMode(db, scan);
@@ -109,7 +109,7 @@ class TimetableModeTest {
     @Test
     void timetableModeInput0() throws Exception {
         //Test input
-        String input = 0 + System.lineSeparator() + 0;
+        String input = 0 + System.lineSeparator() + 0 + System.lineSeparator();
 
         //Setup for testing input?
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());

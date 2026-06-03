@@ -131,5 +131,72 @@ class CsvToSqliteLoaderTest {
         );
     }
 
+    @DisplayName("6.Extra Testing 0 arguments for main()")
+    @Tag("Jayden")
+    @Tag("Additional")
+    @Test
+    void mainWithZeroArguments() {
+        assertThrows(Exception.class,() -> CsvToSqliteLoader.main(new String[]{}));
+        String output = captureOutputStream.toString();
+        assertAll(
+                () -> assertTrue(output.contains("../Spec and CSVs/CSV")),
+                () -> assertTrue(output.contains("timetable.db"))
+        );
+    }
+
+    @DisplayName("6.Extra Testing 1 arguments for main()")
+    @Tag("Jayden")
+    @Tag("Additional")
+    @Test
+    void mainWithOneArgument() throws Exception{
+        CsvToSqliteLoader.main(new String[]{"./Spec and CSVs/CSV"});
+        String output = captureOutputStream.toString();
+        assertAll(
+                () -> assertTrue(output.contains("Done. Loaded 8 file(s)")),
+                () -> assertTrue(output.contains("timetable.db"))
+        );
+    }
+
+    @DisplayName("6.Extra CSV Stripping False Branch")
+    @Tag("Jayden")
+    @Tag("Additional")
+    @Test
+    void parsingCSVFalseStrippingBranch() throws Exception{
+        Path tempDir = Files.createTempDirectory("no-strip");
+        Path csv = tempDir.resolve("no-strip.csv");
+        Path db = tempDir.resolve("no-strip.db");
+
+        Files.writeString(csv,"Topic,Availability,Class,Class instance,Date,Day,Time,Location\\n");
+
+        CsvToSqliteLoader.main(new String[]{tempDir.toString(),db.toString()});
+
+        assertTrue(captureOutputStream.toString().contains("Done. Loaded 1 file(s)"));
+        Files.deleteIfExists(csv);
+        Files.deleteIfExists(db);
+        Files.deleteIfExists(tempDir);
+    }
+
+    @DisplayName("6.Extra CSV Missing column error Branch")
+    @Tag("Jayden")
+    @Tag("Additional")
+    @Test
+    void missingColumnErrorBranch() throws Exception{
+        Path tempDir = Files.createTempDirectory("bad-header");
+        Path csv    = tempDir.resolve("bad.csv");
+        Path db     = tempDir.resolve("bad.db");
+
+        Files.writeString(csv,
+                "Subject,Availability,Class,Class instance,Date,Day,Time,Location\n" +
+                        "COMP1002 Something,In person - Bedford Park - S1 - 1,Lecture,1," +
+                        "02 Mar - 30 Jun,Monday,09:00 - 11:00,Building Room\n");
+
+        assertThrowsExactly(IllegalArgumentException.class,
+                () -> CsvToSqliteLoader.main(new String[]{tempDir.toString(), db.toString()}));
+
+        Files.deleteIfExists(csv);
+        Files.deleteIfExists(db);
+        Files.deleteIfExists(tempDir);
+    }
+
 
 }
