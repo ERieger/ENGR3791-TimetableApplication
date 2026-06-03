@@ -620,12 +620,70 @@ class TimetableModeTest {
                 () -> assertTrue(captureOutputStream.toString().contains("Deletion cancelled"))
         );
     }
+    @DisplayName("5.Extra Delete mode delete cancels correctly from not selecting timetable")
+    @Tag("Jayden")
+    @ParameterizedTest(name ="Cancel uses {0}")
+    @ValueSource(strings = {"", "0"})
+    void deleteModeCancelDelete(String testInput) throws Exception {
+        String input =  "4\n" + // Enter timetable mode
+                "1\n" + // Create a timetable
+                "testTimetable1\n" + // Name timetable
+                "\n" + // Default semester
+                "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                "\n" + // Default campus
+                "yes\n" + // Allow lecture overlap
+                "\n" + // Default preference order
+                "4\n" + // Delete mode
+                testInput + // Cancel delete
+                "\n" +
+                "0\n" + // Exit timetable mode
+                "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Generated timetable")),
+                () -> assertTrue(captureOutputStream.toString().contains("DELETE GENERATED TIMETABLE")),
+                () -> assertTrue(captureOutputStream.toString().contains("Deletion cancelled"))
+        );
+    }
 
     @DisplayName("5.Extra Export cancels correctly after prompt")
     @Tag("Jayden")
     @Tag("Core")
+    @ParameterizedTest(name ="Cancel uses {0}")
+    @ValueSource(strings = {"", "0"})
+    void exportModeCancelPrompt(String testInput) throws Exception {
+        String input =  "4\n" + // Enter timetable mode
+                "1\n" + // Create a timetable
+                "testTimetable1\n" + // Name timetable
+                "\n" + // Default semester
+                "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                "\n" + // Default campus
+                "yes\n" + // Allow lecture overlap
+                "\n" + // Default preference order
+                "5\n" + // Export mode
+                testInput + // Cancel Export
+                "\n" +
+                "0\n" + // Exit timetable mode
+                "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Generated timetable")),
+                () -> assertTrue(captureOutputStream.toString().contains("EXPORT GENERATED TIMETABLE")),
+                () -> assertTrue(captureOutputStream.toString().contains(" Export cancelled."))
+
+        );
+    }
+    @DisplayName("5.Extra Export cancels correctly after selecting timetable")
+    @Tag("Jayden")
+    @Tag("Core")
     @Test
-    void exportModeCancelDelete() throws Exception {
+    void exportModeCancelAfterSelection() throws Exception {
         String input =  "4\n" + // Enter timetable mode
                 "1\n" + // Create a timetable
                 "testTimetable1\n" + // Name timetable
@@ -650,5 +708,4 @@ class TimetableModeTest {
 
         );
     }
-
 }
