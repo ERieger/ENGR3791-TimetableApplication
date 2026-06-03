@@ -538,13 +538,58 @@ class TimetableModeTest {
     @Tag("Core")
     @Test
     void generatingModeErrors() throws Exception {
+        String input =
+                "4\n" +   // Main menu -> Timetable mode
+                        "1\n" +   // Generate timetable
+                        "testErrors\n" +
+                        "x\n" +   // Invalid semester
+                        "1\n" +   // Valid semester
+                        "999\n" + // Invalid topics
+                        "1\n" +   // Valid topic (first listed)
+                        "9\n" +   // Invalid campus
+                        "1\n" +   // Valid campus (first listed)
+                        "maybe\n" + // Invalid yes/no
+                        "yes\n" +   // Valid yes/no
+                        "\n" +      // Preferences: none/default
+                        "2\n" +   // Browse generated
+                        "abc\n" + // Invalid number
+                        "4\n" +   // Delete generated
+                        "99\n" +  // Out of range
+                        "5\n" +   // Export generated
+                        "1\n" +   // Pick first timetable
+                        "9\n" +   // Invalid export format
+                        "0\n" +   // Exit timetable mode
+                        "0\n";    // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Invalid semester selection.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Select at least one valid topic.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Select at least one campus.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Please enter yes or no.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Invalid number.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Number out of range.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Unknown format option.")),
+                () -> assertTrue(captureOutputStream.toString().contains("Export cancelled."))
+        );
+
     }
 
-
-
-
-
-
+    @DisplayName("5.Extra Editing a Generated Timetable")
+    @Tag("Jayden")
+    @Tag("Core")
+    @Test
+    void editingAGeneratedTimetable() throws Exception {
+        String input = "4\n" + "1\n" +"\n" + "3\n" + "1,4,5,8\n" +"1,3\n"+ "yes\n" + "\n" + "3\n"+ "1\n" + "1\n" +"3\n" + "0\n".repeat(4);
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Generated timetable with 8 selected class instance(s)")),
+                () -> assertTrue(captureOutputStream.toString().contains("Swapped COMP1002 Laboratory #2 -> #4."))
+        );
+    }
 
 
 }
