@@ -708,4 +708,28 @@ class TimetableModeTest {
 
         );
     }
+    @DisplayName("5.Extra Preferences")
+    @Tag("Jayden")
+    @Tag("Core")
+    @Test
+    void testingPreferences() throws Exception {
+        String input =  "4\n" + // Enter timetable mode
+                "1\n" + // Create a timetable
+                "testTimetable1\n" + // Name timetable
+                "3\n" + // Default semester
+                "COMP1002, COMP1102, COMP1103\n" + // Select topics
+                "\n" + // Default campus
+                "yes\n" + // Allow lecture overlap
+                "13,5,6,4\n" + // Default preference order
+                "0\n" + // Exit timetable mode
+                "0\n"; // Exit app
+
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        TimetableApp.main(new String[]{"data-loader/timetable.db"});
+
+        assertAll(
+                () -> assertTrue(captureOutputStream.toString().contains("Generated timetable"))
+
+        );
+    }
 }
