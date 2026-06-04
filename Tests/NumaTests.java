@@ -14,8 +14,8 @@ Timetable Mode
 
 CSV Loader
 6.01	Not Null Import with Correct Data ✅
-6.02	Incorrect File Type
-6.03	Import with gaps in data
-6.04	Passing Null Data
-6.05	Passing Empty Data
+6.02	Incorrect File Type ✅
+6.03	Import with gaps in data ✅
+6.04	Passing Null Data ✅
+6.05	Passing Empty Data ✅
  */
