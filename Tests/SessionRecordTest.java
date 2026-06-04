@@ -6,23 +6,4 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SessionRecordTest {
 
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void isRegular() {
-    }
-
-    @Test
-    void isOnceOnly() {
-    }
-
-    @Test
-    void dayDisplay() {
-    }
 }

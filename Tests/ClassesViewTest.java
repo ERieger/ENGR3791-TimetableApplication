@@ -17,7 +17,6 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-
 class ClassesViewTest {
     private final InputStream originalInputStream = System.in;
     private final PrintStream originalOutputStream = System.out;
@@ -36,10 +35,7 @@ class ClassesViewTest {
         Files.deleteIfExists(tempDir.resolve("timetable.db-wal"));
         Files.deleteIfExists(tempDir.resolve("timetable.db-shm"));
 
-        CsvToSqliteLoader.main(new String[]{
-                "./Spec and CSVs/CSV",
-                dbPath.toString()
-        });
+        CsvToSqliteLoader.main(new String[]{"./Spec and CSVs/CSV", dbPath.toString()});
     }
 
     @AfterEach
@@ -52,6 +48,7 @@ class ClassesViewTest {
     @BeforeEach
     public void setUp() {
         System.setOut(new PrintStream(captureOutputStream));
+
     }
 
     @AfterEach
@@ -64,20 +61,16 @@ class ClassesViewTest {
     @Tag("Aidan")
     @Tag("Critical")
     @ParameterizedTest(name = "Input {0} should display {1}")
-    @CsvSource({
-            "1, BROWSE ALL CLASSES",
-            "2, VIEW INDIVIDUAL CLASS",
-            "3, EDIT A CLASS",
-            "4, DELETE A CLASS"
-    })
+    @CsvSource({"1, BROWSE ALL CLASSES", "2, VIEW INDIVIDUAL CLASS", "3, EDIT A CLASS", "4, DELETE A CLASS"})
     void classViewInputN(int mode, String modeString) throws Exception {
         //Test input
-        String input = "2\n" + mode +"\n" + "0\n" + "0\n" +"0\n";
-
+        String input = "2\n" + mode + "\n" + "0\n" + "0\n" + "0\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
+        // Timetable App Start with DB
         TimetableApp.main(new String[]{dbPath.toString()});
+
         //Tests
         assertTrue(captureOutputStream.toString().contains("CLASSES VIEW"));
         assertTrue(captureOutputStream.toString().contains(modeString));
@@ -92,11 +85,11 @@ class ClassesViewTest {
         //Test input
         String input = "egg" + System.lineSeparator() + 0;
 
-        //Setup for testing input?
+        //Setup for testing input
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
 
-        //I haven't the faintest idea
+        //Setting up input capture and db for test
         Scanner scan = new Scanner(captureInputStream);
         Database db = new Database("timetable.db");
 
@@ -112,16 +105,16 @@ class ClassesViewTest {
     @Tag("Aidan")
     @Tag("Core")
     @ParameterizedTest
-    @ValueSource(ints = {Integer.MIN_VALUE,Integer.MAX_VALUE})
+    @ValueSource(ints = {Integer.MIN_VALUE, Integer.MAX_VALUE})
     void classViewInputMaxAndMinInts(int mode) throws Exception {
         //Test input
         String input = mode + System.lineSeparator() + 0;
 
-        //Setup for testing input?
+        //Setup for testing input
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
 
-        //I haven't the faintest idea
+        //Setting up input capture and db for test
         Scanner scan = new Scanner(captureInputStream);
         Database db = new Database("timetable.db");
 
@@ -140,13 +133,15 @@ class ClassesViewTest {
     @NullAndEmptySource
     void classViewInputPassingNulls(String mode) throws Exception {
         //Test input
-        String input = mode + System.lineSeparator() + 0;
+        String input = mode +
+                System.lineSeparator() +
+                0;
 
-        //Setup for testing input?
+        //Setup for testing input
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
 
-        //I haven't the faintest idea
+        //Setting up input capture and db for test
         Scanner scan = new Scanner(captureInputStream);
         Database db = new Database("timetable.db");
 
@@ -163,13 +158,16 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void invalidInputShowsWarning() throws Exception {
+        // Test Input
         String input = "10\n" + "0\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
+        // Setting up Class view instance
         ClassesView testView = new ClassesView(null, new Scanner(System.in)); //I tried putting in "data-loader/timetable.db" but it was upset with that
         testView.show();
 
+        // Test
         assertTrue(captureOutputStream.toString().contains("Unknown option – please try again"));
     }
     //could also add in extra tests for edge cases (max/min inputs) if we get time! So its more like the pracs :)
@@ -179,20 +177,21 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void individualClassIncorrectValues() throws Exception {
-        String input = "2\n" + "2\n" + "notaclass\n" + "0\n" + "0\n";
+        //Test Input
+        String input = "2\n" +
+                        "2\n" +
+                        "notaclass\n" +
+                        "0\n" +
+                        "0\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
+        //Timetable App Start
         TimetableApp.main(new String[]{dbPath.toString()});
 
-        System.setOut(System.out);
-        String output = outputStream.toString();
-
-        assertTrue(output.contains("Invalid number"));
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("Invalid number"));
     }
 
     @DisplayName("2.03 Browse all shows warning with no class data")
@@ -200,20 +199,20 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void browseAllNoDataWarning() throws Exception {
-        String input = "2\n" + "1\n" + "0\n" + "0\n";
+        //Test Input
+        String input = "2\n" +
+                        "1\n" +
+                        "0\n" +
+                        "0\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
+        //Timetable App start with no DB
         TimetableApp.main(new String[]{":memory:"});
 
-        System.setOut(System.out);
-        String output = outputStream.toString();
-
-        assertTrue(output.contains("No class data found"));
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("No class data found"));
     }
 
     @DisplayName("2.04 viewing individual classes shows warning with no class data")
@@ -221,41 +220,37 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void individualClassViewNoDataWarning() throws Exception {
-        String input = "2\n" + "2\n" + "0\n" + "0\n";
+        //Test Input
+        String input = "2\n" +
+                        "2\n" +
+                        "0\n" +
+                        "0\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
+        //Timetable App start with no DB
         TimetableApp.main(new String[]{":memory:"});
 
-        System.setOut(System.out);
-        String output = outputStream.toString();
-
-        assertTrue(output.contains("No class data found"));
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("No class data found"));
     }
 
     @DisplayName("2.05 Edit class shows warning with no class data")
     @Tag("Lucy")
     @Tag("Core")
     @Test
-    void editClassNoDataWarning() throws Exception  {
+    void editClassNoDataWarning() throws Exception {
+        //Test input
         String input = "2\n" + "3\n" + "0\n" + "0\n";
-
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
+        //Timetable start with no DB
         TimetableApp.main(new String[]{":memory:"});
 
-        System.setOut(System.out);
-        String output = outputStream.toString();
-
-        assertTrue(output.contains("No class data found"));
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("No class data found"));
     }
 
     @DisplayName("2.06 Delete class shows warning with no class data")
@@ -263,20 +258,20 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void deleteClassNoDataWarning() throws Exception {
-        String input = "2\n" + "4\n" + "0\n" + "0\n";
+        //Test inputs
+        String input = "2\n" +
+                        "4\n" +
+                        "0\n" +
+                        "0\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(inputStream);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
+        //Timetable start with no DB
         TimetableApp.main(new String[]{":memory:"});
 
-        System.setOut(System.out);
-        String output = outputStream.toString();
-
-        assertTrue(output.contains("No class data found"));
+        //Tests
+        assertTrue(captureOutputStream.toString().contains("No class data found"));
     }
 
     @DisplayName("4.01 Blank criteria shows all classes")
@@ -284,31 +279,30 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void blankCriteriaShowsAllClasses() throws Exception {
+        //Test Input
         String input = "3\n" +
                 "\n".repeat(16) +
                 "0\n";
 
         System.setIn(new ByteArrayInputStream(input.getBytes()));
+
+        //Timetable start with DB
         TimetableApp.main(new String[]{dbPath.toString()});
-        String output = captureOutputStream.toString();
 
-
+        //Tests
         assertAll(
-                () -> assertTrue(output.contains("SEARCH RESULTS")),
-                () -> assertTrue(output.contains("COMP1002")),
-                () -> assertTrue(output.contains("COMP1102")),
-                () -> assertTrue(output.contains("COMP1103")),
-                () -> assertTrue(output.contains("COMP1701")),
-                () -> assertTrue(output.contains("COMP1702")),
-                () -> assertTrue(output.contains("COMP1711")),
-                () -> assertTrue(output.contains("ENGR1401")),
-                () -> assertTrue(output.contains("ENGR1762")),
-                () -> assertTrue(output.contains("ENGR1401")),
-                () -> assertTrue(output.contains("Found"))
+                () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1002")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1102")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1103")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1701")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1702")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1711")),
+                () -> assertTrue(captureOutputStream.toString().contains("ENGR1401")),
+                () -> assertTrue(captureOutputStream.toString().contains("ENGR1762")),
+                () -> assertTrue(captureOutputStream.toString().contains("ENGR1401")),
+                () -> assertTrue(captureOutputStream.toString().contains("Found"))
         );
-
-
-
     }
 
     @DisplayName("4.02 Exact topic code retrieves only that class")
@@ -316,6 +310,7 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void exactTopicCodeRetrievesOnlyThatClass() throws Exception {
+        //Test input
         String input = "3\n" +
                         "COMP1711\n" +
                         "\n".repeat(14) +
@@ -323,18 +318,20 @@ class ClassesViewTest {
                         "0\n";
 
         System.setIn(new ByteArrayInputStream(input.getBytes()));
+
+        //Timetable start with DB
         TimetableApp.main(new String[]{dbPath.toString()});
-        String output = captureOutputStream.toString();
 
 //        System.err.println("---- CAPTURED OUTPUT ----");
 //        System.err.println(output);
 //        System.err.println("-------------------------");
 
+        //Tests
         assertAll(
-                () -> assertTrue(output.contains("SEARCH RESULTS")),
-                () -> assertTrue(output.contains("COMP1711")),
-                () -> assertFalse(output.contains("COMP1003")),
-                () -> assertTrue(output.contains("Found"))
+                () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1711")),
+                () -> assertFalse(captureOutputStream.toString().contains("COMP1003")),
+                () -> assertTrue(captureOutputStream.toString().contains("Found"))
         );
     }
 
@@ -342,13 +339,13 @@ class ClassesViewTest {
     @Tag("Elijah")
     @Tag("Additional")
     @ParameterizedTest
-    @ValueSource(strings={"comp1711", "CoMp1711", "COmp1711", "ComP1711", "cOMp1711"})
+    @ValueSource(strings = {"comp1711", "CoMp1711", "COmp1711", "ComP1711", "cOMp1711"})
     void topicNameIsCaseInsensitive(String topic) throws Exception {
         String input = "3\n" +
-                 topic + "\n" +
-                "\n".repeat(14) +
-                "0\n" +
-                "0\n";
+                        topic + "\n" +
+                        "\n".repeat(14) +
+                        "0\n" +
+                        "0\n";
 
         System.setIn(new ByteArrayInputStream(input.getBytes()));
         TimetableApp.main(new String[]{dbPath.toString()});
@@ -359,10 +356,10 @@ class ClassesViewTest {
 //                System.err.println("-------------------------");
 
         assertAll(
-                () -> assertTrue(output.contains("SEARCH RESULTS")),
-                () -> assertTrue(output.contains("COMP1711")),
-                () -> assertFalse(output.contains("COMP1003")),
-                () -> assertTrue(output.contains("Found"))
+                () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
+                () -> assertTrue(captureOutputStream.toString().contains("COMP1711")),
+                () -> assertFalse(captureOutputStream.toString().contains("COMP1003")),
+                () -> assertTrue(captureOutputStream.toString().contains("Found"))
         );
     }
 
@@ -371,10 +368,14 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void noClassMatchSearchMode() throws Exception {
-        String input = "3\n" + "\n".repeat(15) + "0\n";
+        String input = "3\n" +
+                        "\n".repeat(15) +
+                        "0\n";
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
+
         TimetableApp.main(new String[]{":memory:"});
+
         assertAll(
                 () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
                 () -> assertTrue(captureOutputStream.toString().contains("No classes matched the search criteria."))
@@ -386,10 +387,16 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void semesterSearchMode() throws Exception {
-        String input = "3\n" + "\n".repeat(4) + "S1\n" + "\n".repeat(11) + "0\n";
+        String input = "3\n" +
+                "\n".repeat(4) +
+                "S1\n" +
+                "\n".repeat(11) +
+                "0\n";
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
+
         TimetableApp.main(new String[]{dbPath.toString()});
+
         assertAll(
                 () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
                 () -> assertTrue(captureOutputStream.toString().contains("S1")),
@@ -402,10 +409,16 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void campusSearchMode() throws Exception {
-        String input = "3\n" + "\n".repeat(3) + "Tonsley\n" + "\n".repeat(12) + "0\n";
+        String input = "3\n" +
+                "\n".repeat(3) +
+                "Tonsley\n" +
+                "\n".repeat(12) +
+                "0\n";
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
+
         TimetableApp.main(new String[]{dbPath.toString()});
+
         assertAll(
                 () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
                 () -> assertTrue(captureOutputStream.toString().contains("Tonsley")),
@@ -418,10 +431,16 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void invalidInputSearchMode() throws Exception {
-        String input = "3\n" + "\n".repeat(4) + "S9\n" + "\n".repeat(11) + "0\n";
+        String input = "3\n" +
+                "\n".repeat(4) +
+                "S9\n" +
+                "\n".repeat(11) +
+                "0\n";
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
+
         TimetableApp.main(new String[]{dbPath.toString()});
+
         assertAll(
                 () -> assertTrue(captureOutputStream.toString().contains("SEARCH RESULTS")),
                 () -> assertTrue(captureOutputStream.toString().contains("Unknown option – please try again."))
@@ -433,7 +452,10 @@ class ClassesViewTest {
     @Tag("Core")
     @Test
     void printClassDetails() throws Exception {
-        String input = "2\n" + "2\n" + "1\n" + "0\n".repeat(4);
+        String input = "2\n" +
+                        "2\n" +
+                        "1\n" +
+                        "0\n".repeat(4);
 
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
@@ -491,33 +513,31 @@ class ClassesViewTest {
     @Tag("Core")
     @ParameterizedTest(name = "Editing detail {0} to {1}")
     @CsvSource({
-            "1, COMP9999",
-            "2, COMP9999 Extra AI",
-            "3, Online",
-            "4, Tonsley",
-            "5, S2",
-            "6, 2",
-            "7, Workshop",
-            "8, 1",
-            "9, 12 Mar",
-            "10, 9 Jun",
-            "11, Tuesday",
-            "12, 12:00",
-            "13, 14:00",
-            "14, Festival Tower",
-            "15, 501"
+            "1, COMP9999", //Topic Code
+            "2, COMP9999 Extra AI", //Topic Name
+            "3, Online",  //Attendance Type
+            "4, Tonsley",  // Campus
+            "5, S2", // Semester
+            "6, 2", // Availability Number
+            "7, Workshop", //Class type
+            "8, 1", // Instance Number
+            "9, 12 Mar", // Start Date
+            "10, 9 Jun", // End date
+            "11, Tuesday", // Day of Week
+            "12, 12:00", // Start time
+            "13, 14:00", // End Time
+            "14, Festival Tower", // Building
+            "15, 501" // Room
     })
     void editingAllDetailsClass(int detailNo, String change) throws Exception {
-        String input = "2\n" + "3\n" + "1\n" + detailNo +"\n" + change +"\n" + "yes\n" + "0\n".repeat(4);
+        String input = "2\n" + "3\n" + "1\n" + detailNo + "\n" + change + "\n" + "yes\n" + "0\n".repeat(4);
 
         ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
         System.setIn(captureInputStream);
 
         TimetableApp.main(new String[]{dbPath.toString()});
 
-        assertAll(
-                () -> assertTrue(captureOutputStream.toString().contains("Confirm (yes / no):"))
-        );
+        assertAll(() -> assertTrue(captureOutputStream.toString().contains("Confirm (yes / no):")));
     }
 
 

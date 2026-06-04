@@ -6,23 +6,4 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ClassRecordTest {
 
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void primarySession() {
-    }
-
-    @Test
-    void shortLabel() {
-    }
-
-    @Test
-    void matchesSearch() {
-    }
 }
