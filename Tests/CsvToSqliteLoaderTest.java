@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.class)
 class CsvToSqliteLoaderTest {
     private final InputStream originalInputStream = System.in;
     private final PrintStream originalOutputStream = System.out;
