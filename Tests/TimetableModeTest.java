@@ -16,7 +16,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class TimetableModeTest {
 
     private final InputStream originalInputStream = System.in;

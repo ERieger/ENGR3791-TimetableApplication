@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class TimetableAppTest {
     private final InputStream originalInputStream = System.in;
     private final PrintStream originalOutputStream = System.out;

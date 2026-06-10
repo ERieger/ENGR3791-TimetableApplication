@@ -16,7 +16,7 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class ClassesViewTest {
     private final InputStream originalInputStream = System.in;
     private final PrintStream originalOutputStream = System.out;
