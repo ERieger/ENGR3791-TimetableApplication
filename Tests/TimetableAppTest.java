@@ -42,8 +42,6 @@ class TimetableAppTest {
         };
 
         for (String input : inputs) {
-        ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(captureOutputStream));
         System.setIn(new ByteArrayInputStream(input.getBytes()));
 
         TimetableApp.main(new String[]{"data-loader/timetable.db"});
@@ -66,8 +64,6 @@ class TimetableAppTest {
         };
 
         for (String input : inputs) {
-            ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(captureOutputStream));
             System.setIn(new ByteArrayInputStream(input.getBytes()));
 
             TimetableApp.main(new String[]{"data-loader/timetable.db"});
@@ -118,9 +114,7 @@ class TimetableAppTest {
         String input = "0\n";
 
         System.setIn(new ByteArrayInputStream(input.getBytes()));
-        ByteArrayOutputStream captureOutputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(captureOutputStream));
-
+        
         TimetableApp.main(new String[]{"data-loader/timetable.db"});
 
         System.setOut(System.out);
