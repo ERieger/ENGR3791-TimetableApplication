@@ -576,7 +576,7 @@ class TimetableModeTest {
 
     }
 
-    @DisplayName("5.Extra Editing a Generated Timetable")
+    @DisplayName("5.12 Editing a Generated Timetable")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -591,7 +591,7 @@ class TimetableModeTest {
         );
     }
 
-    @DisplayName("5.Extra Delete mode delete cancels correctly after prompt")
+    @DisplayName("5.13 Delete mode delete cancels correctly after prompt")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -620,7 +620,7 @@ class TimetableModeTest {
                 () -> assertTrue(captureOutputStream.toString().contains("Deletion cancelled"))
         );
     }
-    @DisplayName("5.Extra Delete mode delete cancels correctly from not selecting timetable")
+    @DisplayName("5.14 Delete mode delete cancels correctly from not selecting timetable")
     @Tag("Jayden")
     @ParameterizedTest(name ="Cancel uses {0}")
     @ValueSource(strings = {"", "0"})
@@ -649,7 +649,7 @@ class TimetableModeTest {
         );
     }
 
-    @DisplayName("5.Extra Export cancels correctly after prompt")
+    @DisplayName("5.15 Export cancels correctly after prompt")
     @Tag("Jayden")
     @Tag("Core")
     @ParameterizedTest(name ="Cancel uses {0}")
@@ -679,7 +679,7 @@ class TimetableModeTest {
 
         );
     }
-    @DisplayName("5.Extra Export cancels correctly after selecting timetable")
+    @DisplayName("5.16 Export cancels correctly after selecting timetable")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -708,7 +708,7 @@ class TimetableModeTest {
 
         );
     }
-    @DisplayName("5.Extra Preferences")
+    @DisplayName("5.17 Preferences")
     @Tag("Jayden")
     @Tag("Core")
     @Test
