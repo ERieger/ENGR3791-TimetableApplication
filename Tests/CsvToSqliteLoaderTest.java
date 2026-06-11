@@ -112,7 +112,7 @@ class CsvToSqliteLoaderTest {
         );
     }
 
-    @DisplayName("6.Extra Passing Empty Data")
+    @DisplayName("6.06 Passing Empty Data - Extra")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -132,7 +132,7 @@ class CsvToSqliteLoaderTest {
         );
     }
 
-    @DisplayName("6.Extra Testing 0 arguments for main()")
+    @DisplayName("6.07 Testing 0 arguments for main()")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -145,7 +145,7 @@ class CsvToSqliteLoaderTest {
         );
     }
 
-    @DisplayName("6.Extra Testing 1 arguments for main()")
+    @DisplayName("6.08 Testing 1 arguments for main()")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -158,7 +158,7 @@ class CsvToSqliteLoaderTest {
         );
     }
 
-    @DisplayName("6.Extra CSV Stripping False Branch")
+    @DisplayName("6.09 CSV Stripping False Branch")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -177,7 +177,7 @@ class CsvToSqliteLoaderTest {
         Files.deleteIfExists(tempDir);
     }
 
-    @DisplayName("6.Extra CSV Missing column error Branch")
+    @DisplayName("6.10 CSV Missing column error Branch")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
