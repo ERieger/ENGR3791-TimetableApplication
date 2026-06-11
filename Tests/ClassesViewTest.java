@@ -447,7 +447,7 @@ class ClassesViewTest {
         );
     }
 
-    @DisplayName("4.Extra Printing a Specific Class' Details")
+    @DisplayName("4.08 Printing a Specific Class' Details")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -469,7 +469,7 @@ class ClassesViewTest {
         );
     }
 
-    @DisplayName("4.Extra Editing a Specific Class' Details")
+    @DisplayName("4.09 Editing a Specific Class' Details")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -488,7 +488,7 @@ class ClassesViewTest {
         );
     }
 
-    @DisplayName("4.Extra Deleting a Specific Class' Details")
+    @DisplayName("4.10 Deleting a Specific Class' Details")
     @Tag("Jayden")
     @Tag("Core")
     @Test
@@ -508,7 +508,7 @@ class ClassesViewTest {
         );
     }
 
-    @DisplayName("4.Extra Editing All of a Specific Class' Details")
+    @DisplayName("4.11 Editing All of a Specific Class' Details")
     @Tag("Jayden")
     @Tag("Core")
     @ParameterizedTest(name = "Editing detail {0} to {1}")
