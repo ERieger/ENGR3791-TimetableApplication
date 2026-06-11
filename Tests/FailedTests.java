@@ -58,7 +58,7 @@ class FailedTests {
         System.setOut(originalOutputStream);
     }
 
-    @DisplayName("Failed Test, Splitting building and room when building is empty")
+    @DisplayName("7.02 Session record handles empty building/location correctly")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -68,7 +68,7 @@ class FailedTests {
         assertEquals("5.25", session.room);
     }
 
-    @DisplayName("Failed Test, Null Location crashing App")
+    @DisplayName("7.01 Session record handles null location without crashing")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -76,7 +76,7 @@ class FailedTests {
         assertDoesNotThrow(() -> new SessionRecord(1,"01 Feb","02 Feb","Monday",null,"09:00","10:00",null));
     }
 
-    @DisplayName("Failed Test, Setting impossible time")
+    @DisplayName("7.03 Timetable rejects impossible/invalid time values")
     @Tag("Jayden")
     @Tag("Additional")
     @Test
@@ -90,6 +90,40 @@ class FailedTests {
         TimetableApp.main(new String[]{dbPath.toString()});
 
         assertTrue(captureOutputStream.toString().contains("Failed to Update"));
+    }
+
+    @DisplayName("7.04 Timetable rejects impossible/invalid campus")
+    @Tag("Elijah")
+    @Tag("Core")
+    @Test
+    void timetableRejectingInvalidCampus() throws Exception {
+
+        String input = "2\n" + "3\n" + "1\n" + "4\n" + "Mawson Lakes\n" + "yes\n" + "0\n".repeat(4);
+
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        TimetableApp.main(new String[]{dbPath.toString()});
+        System.out.println(captureOutputStream.toString());
+
+        assertFalse(captureOutputStream.toString().contains("Campus updated."));
+    }
+
+    @DisplayName("7.05 Timetable rejects impossible/invalid semester")
+    @Tag("Elijah")
+    @Tag("Additional")
+    @Test
+    void timetableRejectingInvalidSemester() throws Exception {
+
+        String input = "2\n" + "3\n" + "1\n" + "5\n" + "S492\n" + "yes\n" + "0\n".repeat(4);
+
+        ByteArrayInputStream captureInputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(captureInputStream);
+
+        TimetableApp.main(new String[]{dbPath.toString()});
+        System.out.println(captureOutputStream.toString());
+
+        assertFalse(captureOutputStream.toString().contains("Semester updated."));
     }
 
 
