@@ -55,15 +55,12 @@ class TimetableAppTest {
     @Tag("Lucy")
     @Tag("Core")
     @DisplayName("1.02 Main Menu Inputs (Incorrect)")
-    @Test
-    void mainMenuInputsIncorrect() throws Exception{
-        String[] inputs = {
-                "7\n0\n",
-                "30\n0\n",
-                "b\n0\n"
-        };
+    @ParameterizedTest
+    @CsvSource ({"'7\n0\n'",
+            "'30\n0\n'",
+            "'b\n0\n'"})
+    void mainMenuInputsIncorrect(String input) throws Exception{
 
-        for (String input : inputs) {
             System.setIn(new ByteArrayInputStream(input.getBytes()));
 
             TimetableApp.main(new String[]{"data-loader/timetable.db"});
@@ -72,7 +69,6 @@ class TimetableAppTest {
 
             assertTrue(output.contains("Unknown option – please try again"));
         }
-    }
 
     @Tag("Numa")
     @Tag("Core")
